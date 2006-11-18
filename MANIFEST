@@ -2,5 +2,10 @@ Changes
 Makefile.PL
 MANIFEST
 README
+pkwalify
 t/Kwalify.t
+t/pkwalify.t
+t/testdata/document05a.yaml
+t/testdata/document05b.yaml
+t/testdata/schema05.yaml
 lib/Kwalify.pm
