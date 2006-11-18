@@ -2,12 +2,13 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.3 2006/11/18 12:52:04 eserte Exp $
+# $Id: pkwalify.t,v 1.4 2006/11/18 13:22:13 eserte Exp $
 # Author: Slaven Rezic
 #
 
 use strict;
 use FindBin;
+use Getopt::Long;
 
 BEGIN {
     if (!eval q{
@@ -23,6 +24,10 @@ my @yaml_syck_defs = (["schema05.yaml", "document05a.yaml", 1],
 		      ["schema05.yaml", "document05b.yaml", 0],
 		     );
 my @json_defs = ();
+
+my $v;
+GetOptions("v!")
+    or die "usage: $0 [-v]";
 
 plan tests => scalar(@yaml_syck_defs) + scalar(@json_defs);
 
@@ -57,8 +62,20 @@ sub any_test {
     
     my @cmd = @cmd;
     push @cmd, '-f' => $schema_file, $data_file;
-    system(@cmd);
-    my $valid = $? == 0 ? 1 : 0;
+
+    my $valid;
+    if (eval { require IPC::Run; 1 }) {
+	my($stdin,$stdout,$stderr);
+	if (!IPC::Run::run(\@cmd, \$stdin, \$stdout, \$stderr)) {
+	    $valid = 0;
+	    diag $stderr if $v;
+	} else {
+	    $valid = 1;
+	}
+    } else {
+	system(@cmd);
+	$valid = $? == 0 ? 1 : 0;
+    }
     is($valid, $expect_validity, "@cmd");
 }
 
