@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.3 2006/11/18 12:53:02 eserte Exp $
+# $Id: Kwalify.t,v 1.4 2006/11/18 13:16:10 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -26,7 +26,7 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 34;
-    plan tests => 1 + $yaml_syck_tests;
+    plan tests => 1 + $yaml_syck_tests + 2;
 }
 
 BEGIN {
@@ -338,6 +338,99 @@ EOF
 		     qr{\Q[/2/name] `bar' is already used at `/1/name'},
 		    ]);
 
+}
+
+{
+    my $schema06_pl =
+	{
+	 'sequence' => [
+			{
+			 'mapping' => {
+				       'email' => {
+						   'type' => 'str'
+						  },
+				       'groups' => {
+						    'sequence' => [
+								   {
+								    'unique' => 'yes',
+								    'type' => 'str'
+								   }
+								  ],
+						    'type' => 'seq'
+						   },
+				       'name' => {
+						  'unique' => 'yes',
+						  'required' => 'yes',
+						  'type' => 'str'
+						 }
+				      },
+			 'required' => 'yes',
+			 'type' => 'map'
+			}
+		       ],
+	 'type' => 'seq'
+	};
+
+    my $document06a_pl =
+	[
+	 {
+	  'email' => 'admin@mail.com',
+	  'groups' => [
+		       'users',
+		       'foo',
+		       'admin'
+		      ],
+	  'name' => 'foo'
+	 },
+	 {
+	  'email' => 'admin@mail.com',
+	  'groups' => [
+		       'users',
+		       'admin'
+		      ],
+	  'name' => 'bar'
+	 },
+	 {
+	  'email' => 'baz@mail.com',
+	  'groups' => [
+		       'users'
+		      ],
+	  'name' => 'baz'
+	 }
+	];
+
+    my $document06b_pl =
+	[
+	 {
+	  'email' => 'admin@mail.com',
+	  'groups' => [
+		       'foo',
+		       'users',
+		       'admin',
+		       'foo'
+		      ],
+	  'name' => 'foo'
+	 },
+	 {
+	  'email' => 'admin@mail.com',
+	  'groups' => [
+		       'admin',
+		       'users'
+		      ],
+	  'name' => 'bar'
+	 },
+	 {
+	  'email' => 'baz@mail.com',
+	  'groups' => [
+		       'users'
+		      ],
+	  'name' => 'bar'
+	 }
+	];
+
+    ok(validate($schema06_pl, $document06a_pl), "valid data against perl schema");
+    eval { validate($schema06_pl, $document06b_pl) };
+    ok($@, "invalid data against perl schema");
 }
 
 __END__
