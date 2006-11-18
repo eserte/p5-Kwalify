@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.2 2006/11/18 00:46:33 eserte Exp $
+# $Id: Kwalify.t,v 1.3 2006/11/18 12:53:02 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -14,6 +14,11 @@ BEGIN {
 	1;
     }) {
 	print "1..0 # skip: no Test::More module\n";
+	exit;
+    }
+
+    if ($] < 5.005) {
+	print "1..0 # skip: test works only with perl 5.005 or better\n";
 	exit;
     }
 }
