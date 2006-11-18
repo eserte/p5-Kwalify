@@ -16,6 +16,12 @@ Or with modern CPAN.pm just:
 
    cpan .
 
+USAGE
+
+   pkwalify -f schemafile datafile
+
+schemafile and datafile may be YAML or JSON files.
+
 COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
