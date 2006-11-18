@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.4 2006/11/18 12:45:16 eserte Exp $
+# $Id: Kwalify.pm,v 1.5 2006/11/18 12:55:35 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -20,7 +20,15 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/);
+
+BEGIN {
+    if ($] < 5.006) {
+	$INC{"warnings.pm"} = 1;
+	*warnings::import = sub { };
+	*warnings::unimport = sub { };
+    }
+}
 
 sub validate ($$) {
     my($schema, $data) = @_;
@@ -66,31 +74,31 @@ sub _additional_rules {
 	    $self->_error("Non-valid data `$data' does not match /$pattern/");
 	}
     }
-    if (defined $schema->{length}) {
-	if (!UNIVERSAL::isa($schema->{length}, "HASH")) {
+    if (defined $schema->{'length'}) {
+	if (!UNIVERSAL::isa($schema->{'length'}, "HASH")) {
 	    $self->_die("`length' must be a hash with keys max and/or min");
 	}
 	my $length = length($data);
-	if (exists $schema->{length}->{min}) {
-	    my $min = $schema->{length}->{min};
+	if (exists $schema->{'length'}->{min}) {
+	    my $min = $schema->{'length'}->{min};
 	    if ($length < $min) {
 		$self->_error("`$data' is too short (length $length < min $min)");
 	    }
 	}
-	if (exists $schema->{length}->{'min-ex'}) {
-	    my $min = $schema->{length}->{'min-ex'};
+	if (exists $schema->{'length'}->{'min-ex'}) {
+	    my $min = $schema->{'length'}->{'min-ex'};
 	    if ($length <= $min) {
 		$self->_error("`$data' is too short (length $length <= min $min)");
 	    }
 	}
-	if (exists $schema->{length}->{max}) {
-	    my $max = $schema->{length}->{max};
+	if (exists $schema->{'length'}->{max}) {
+	    my $max = $schema->{'length'}->{max};
 	    if ($length > $max) {
 		$self->_error("`$data' is too long (length $length > max $max)");
 	    }
 	}
-	if (exists $schema->{length}->{'max-ex'}) {
-	    my $max = $schema->{length}->{'max-ex'};
+	if (exists $schema->{'length'}->{'max-ex'}) {
+	    my $max = $schema->{'length'}->{'max-ex'};
 	    if ($length > $max) {
 		$self->_error("`$data' is too long (length $length >= max $max)");
 	    }
