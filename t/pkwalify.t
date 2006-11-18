@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.1 2006/11/18 00:36:49 eserte Exp $
+# $Id: pkwalify.t,v 1.2 2006/11/18 00:46:44 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -19,14 +19,37 @@ BEGIN {
     }
 }
 
-plan tests => 2;
+my @yaml_syck_defs = (["schema05.yaml", "document05a.yaml", 1],
+		      ["schema05.yaml", "document05b.yaml", 0],
+		     );
+my @json_defs = ();
+
+plan tests => scalar(@yaml_syck_defs) + scalar(@json_defs);
 
 my $script = "pkwalify";
 my @cmd = ($^X, "-Mblib", $script);
 
-for my $def (["schema05.yaml", "document05a.yaml", 1],
-	     ["schema05.yaml", "document05b.yaml", 0],
-	    ) {
+SKIP: {
+    skip("Need YAML::Syck for tests", scalar(@yaml_syck_defs))
+	if !eval { require YAML::Syck; 1 };
+
+    for my $def (@yaml_syck_defs) {
+	any_test($def);
+    }
+}
+
+SKIP: {
+    skip("Need JSON for tests", scalar(@json_defs))
+	if !eval { require JSON; 1 };
+
+    for my $def (@json_defs) {
+	any_test($def);
+    }
+}
+
+sub any_test {
+    my($def) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level+1;
     my($schema_file, $data_file, $expect_validity) = @$def;
     $_ = "$FindBin::RealBin/testdata/$_" for ($schema_file, $data_file);
     
