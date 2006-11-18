@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.1 2006/11/18 00:13:17 eserte Exp $
+# $Id: Kwalify.pm,v 1.2 2006/11/18 12:40:27 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -20,7 +20,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/);
 
 sub validate ($$) {
     my($schema, $data) = @_;
@@ -290,7 +290,12 @@ sub _validate_map {
 	$self->_error("Non-valid data " . $data . ", expected mapping");
     }
     my %seen_key;
+    my $default_key_schema;
     while(my($key,$subschema) = each %$mapping) {
+	if ($key eq '=') { # the "default" key
+	    $default_key_schema = $subschema;
+	    next;
+	}
 	my $subpath = _append_path($path, $key);
 	$self->{path} = $subpath;
 	if (!UNIVERSAL::isa($subschema, 'HASH')) {
@@ -325,7 +330,11 @@ sub _validate_map {
 	my $subpath = _append_path($path, $key);
 	$self->{path} = $subpath;
 	if (!$seen_key{$key}) {
-	    $self->_error("Unexpected key `$key'");
+	    if ($default_key_schema) {
+		$self->_validate($default_key_schema, $val, $subpath, \@context);
+	    } else {
+		$self->_error("Unexpected key `$key'");
+	    }
 	}
     }
 }
