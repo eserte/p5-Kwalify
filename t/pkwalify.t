@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.2 2006/11/18 00:46:44 eserte Exp $
+# $Id: pkwalify.t,v 1.3 2006/11/18 12:52:04 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -51,10 +51,12 @@ sub any_test {
     my($def) = @_;
     local $Test::Builder::Level = $Test::Builder::Level+1;
     my($schema_file, $data_file, $expect_validity) = @$def;
-    $_ = "$FindBin::RealBin/testdata/$_" for ($schema_file, $data_file);
+    for ($schema_file, $data_file) {
+	$_ = "$FindBin::RealBin/testdata/$_";
+    }
     
     my @cmd = @cmd;
-    push @cmd, -f => $schema_file, $data_file;
+    push @cmd, '-f' => $schema_file, $data_file;
     system(@cmd);
     my $valid = $? == 0 ? 1 : 0;
     is($valid, $expect_validity, "@cmd");
