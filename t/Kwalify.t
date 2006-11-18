@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.1 2006/11/18 00:13:38 eserte Exp $
+# $Id: Kwalify.t,v 1.2 2006/11/18 00:46:33 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -18,8 +18,10 @@ BEGIN {
     }
 }
 
+my $yaml_syck_tests;
 BEGIN {
-    plan tests => 35;
+    $yaml_syck_tests = 34;
+    plan tests => 1 + $yaml_syck_tests;
 }
 
 BEGIN {
@@ -47,7 +49,7 @@ sub is_invalid_yaml {
 }
 
 SKIP: {
-    skip("Need YAML::Syck for tests", 1)
+    skip("Need YAML::Syck for tests", $yaml_syck_tests)
 	if !eval { require YAML::Syck; 1 };
 
     my $schema01 = <<'EOF';
