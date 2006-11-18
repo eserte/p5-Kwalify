@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.3 2006/11/18 12:42:56 eserte Exp $
+# $Id: Kwalify.pm,v 1.4 2006/11/18 12:45:16 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -20,7 +20,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.3 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
 
 sub validate ($$) {
     my($schema, $data) = @_;
@@ -379,17 +379,16 @@ Typically used together with YAML or JSON:
   validate(YAML::LoadFile($schema_file), YAML::LoadFile($data_file));
 
   use JSON;
-  validate(...);
+  validate(jsonToObj($schema_data), jsonToObj($data));
 
 =head1 DESCRIPTION
 
+=head2 validate($schema_data, $data)
 
-=head2 EXPORT
+Validate I<$data> according to Kwalify schema specified in
+I<$schema_data>. Dies if the validation fails.
 
-validate.
-
-=head1 SEE ALSO
-
+B<validate> may be exported.
 
 =head1 AUTHOR
 
