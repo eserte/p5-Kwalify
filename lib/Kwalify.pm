@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.2 2006/11/18 12:40:27 eserte Exp $
+# $Id: Kwalify.pm,v 1.3 2006/11/18 12:42:56 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -20,12 +20,12 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.3 $ =~ /(\d+)\.(\d+)/);
 
 sub validate ($$) {
     my($schema, $data) = @_;
     my $self = Kwalify->new;
-    $self->_validate($schema, $data, "/", []);
+    $self->_validate($schema, $data, "/");
     if (@{$self->{errors}}) {
 	die join("\n", @{$self->{errors}}) . "\n";
     } else {
@@ -39,27 +39,23 @@ sub new {
 }
 
 sub _validate {
-    my($self, $schema, $data, $path, $prev_context, $args) = @_;
+    my($self, $schema, $data, $path, $args) = @_;
     $self->{path} = $path;
 
     if (!UNIVERSAL::isa($schema, "HASH")) {
 	$self->_die("Schema structure must be a hash reference");
     }
 
-    my @context = (@$prev_context, "");
-    $self->{context} = \@context;
-
     my $type = $schema->{type};
     if (!defined $type) {
 	$type = 'str'; # default type;
-	$context[-1] .= "using default type `str'\n";
     }
     my $type_check_method = "_validate_" . $type;
     if (!$self->can($type_check_method)) {
 	$self->_die("Invalid or unimplemented type `$type'");
     }
 
-    $self->$type_check_method($schema, $data, $path, \@context, $args);
+    $self->$type_check_method($schema, $data, $path, $args);
 }
 
 sub _additional_rules {
@@ -236,9 +232,7 @@ sub _validate_any {
 }
 
 sub _validate_seq {
-    my($self, $schema, $data, $path, $prev_context) = @_;
-    my @context = (@$prev_context, "");
-    $self->{context} = \@context;
+    my($self, $schema, $data, $path) = @_;
     if (!exists $schema->{sequence}) {
 	$self->_die("`sequence' missing with `seq' type");
     }
@@ -259,7 +253,7 @@ sub _validate_seq {
     my $index = 0;
     for my $elem (@$data) {
 	my $subpath = _append_path($path, $index);
-	$self->_validate($subschema, $elem, $subpath, \@context, { unique_mapping_val => \%unique_mapping_val});
+	$self->_validate($subschema, $elem, $subpath, { unique_mapping_val => \%unique_mapping_val});
 	if ($unique) {
 	    if (exists $unique_val{$elem}) {
 		$self->_error("`$elem' is already used at `$unique_val{$elem}'");
@@ -272,9 +266,7 @@ sub _validate_seq {
 }
 
 sub _validate_map {
-    my($self, $schema, $data, $path, $prev_context, $args) = @_;
-    my @context = (@$prev_context, "");
-    $self->{context} = \@context;
+    my($self, $schema, $data, $path, $args) = @_;
     my $unique_mapping_val;
     if ($args && $args->{unique_mapping_val}) {
 	$unique_mapping_val = $args->{unique_mapping_val};
@@ -322,7 +314,7 @@ sub _validate_map {
 	    }
 	}
 
-	$self->_validate($subschema, $data->{$key}, $subpath, \@context); # XXX context not correct...
+	$self->_validate($subschema, $data->{$key}, $subpath);
 	$seen_key{$key}++;
     }
 
@@ -331,7 +323,7 @@ sub _validate_map {
 	$self->{path} = $subpath;
 	if (!$seen_key{$key}) {
 	    if ($default_key_schema) {
-		$self->_validate($default_key_schema, $val, $subpath, \@context);
+		$self->_validate($default_key_schema, $val, $subpath);
 	    } else {
 		$self->_error("Unexpected key `$key'");
 	    }
@@ -341,13 +333,13 @@ sub _validate_map {
 
 sub _die {
     my($self, $msg) = @_;
-    $msg = "[$self->{path}] $msg"; #XXX . ", additional context information: " . "@{ $self->{context} }";
+    $msg = "[$self->{path}] $msg";
     die $msg."\n";
 }
 
 sub _error {
     my($self, $msg) = @_;
-    $msg = "[$self->{path}] $msg"; #XXX . ", additional context information: " . "@{ $self->{context} }";
+    $msg = "[$self->{path}] $msg";
     push @{$self->{errors}}, $msg;
     0;
 }
