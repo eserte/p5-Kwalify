@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+# -*- perl -*-
+
+#
+# $Id: pkwalify,v 1.1 2006/11/18 00:36:43 eserte Exp $
+# Author: Slaven Rezic
+#
+# Copyright (C) 2006 Slaven Rezic. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: slaven@rezic.de
+# WWW:  http://www.rezic.de/eserte/
+#
+
+use strict;
+use Kwalify;
+use Getopt::Long;
+
+my $schema_file;
+GetOptions("f=s" => \$schema_file)
+    or usage();
+
+if (!defined $schema_file) {
+    usage("-f option is mandatory");
+}
+
+my $data_file = shift @ARGV;
+if (!defined $data_file) {
+    usage("datafile is mandatory");
+}
+
+my $schema = read_file($schema_file);
+my $data   = read_file($data_file);
+
+Kwalify::validate($schema, $data);
+
+sub read_file {
+    my $file = shift;
+    my $data;
+    my @errors;
+    if (eval { require YAML::Syck; 1 }) {
+	$data = eval { YAML::Syck::LoadFile($file) };
+	return $data if $data && !$@;
+	push @errors, $@;
+    }
+    if (eval { require YAML; 1 }) {
+	$data = eval { YAML::LoadFile($file) };
+	return $data if $data && !$@;
+	push @errors, $@;
+    }
+    if (eval { require JSON; 1 }) {
+	$data = eval {
+	    open JSON, "< $file"
+		or die "Can't open <$file>: $!";
+	    local $/ = undef;
+	    my $json = <JSON>;
+	    close JSON;
+	    JSON::jsonToObj($json);
+	};
+	return $data if $data && !$@;
+	push @errors, $@;
+    }
+    die "Cannot parse <$file>. Cumulated errors:\n" . join("\n", @errors) . "\n";
+}
+
+sub usage {
+    my($msg) = @_;
+    $msg .= "\n" if defined $msg;
+    die <<EOF;
+${msg}usage: $0 -f schema.yml|schema.json data.yml|data.json
+EOF
+}
+
+__END__
