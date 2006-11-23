@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.5 2006/11/18 12:55:35 eserte Exp $
+# $Id: Kwalify.pm,v 1.6 2006/11/23 20:56:23 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -20,7 +20,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
@@ -32,8 +32,8 @@ BEGIN {
 
 sub validate ($$) {
     my($schema, $data) = @_;
-    my $self = Kwalify->new;
-    $self->_validate($schema, $data, "/");
+    my $self = Kwalify::Validator->new;
+    $self->validate($schema, $data, "/");
     if (@{$self->{errors}}) {
 	die join("\n", @{$self->{errors}}) . "\n";
     } else {
@@ -41,12 +41,14 @@ sub validate ($$) {
     }
 }
 
+package Kwalify::Validator;
+
 sub new {
     my($class) = @_;
     bless { errors => [] }, $class;
 }
 
-sub _validate {
+sub validate {
     my($self, $schema, $data, $path, $args) = @_;
     $self->{path} = $path;
 
@@ -58,7 +60,7 @@ sub _validate {
     if (!defined $type) {
 	$type = 'str'; # default type;
     }
-    my $type_check_method = "_validate_" . $type;
+    my $type_check_method = "validate_" . $type;
     if (!$self->can($type_check_method)) {
 	$self->_die("Invalid or unimplemented type `$type'");
     }
@@ -166,7 +168,7 @@ sub _additional_rules {
     }
 }
 
-sub _validate_text {
+sub validate_text {
     my($self, $schema, $data, $path) = @_;
     if (!defined $data || ref $data) {
 	return $self->_error("Non-valid data `" . (defined $data ? $data : 'undef') . "', expected text");
@@ -174,7 +176,7 @@ sub _validate_text {
     $self->_additional_rules($schema, $data, $path);
 }
 
-sub _validate_str {
+sub validate_str {
     my($self, $schema, $data, $path) = @_;
     if (!defined $data || ref $data || $data =~ m{^\d+(\.\d+)?$}) {
 	return $self->_error("Non-valid data `" . (defined $data ? $data : 'undef') . "', expected a str");
@@ -182,7 +184,7 @@ sub _validate_str {
     $self->_additional_rules($schema, $data, $path);
 }
 
-sub _validate_int {
+sub validate_int {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^[+-]?\d+$}) { # XXX what about scientific notation?
 	$self->_error("Non-valid data `" . $data . "', expected an int");
@@ -190,7 +192,7 @@ sub _validate_int {
     $self->_additional_rules($schema, $data, $path);
 }
 
-sub _validate_float {
+sub validate_float {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^[+-]?\d+\.\d+$}) { # XXX other values?
 	$self->_error("Non-valid data `" . $data . "', expected a float");
@@ -198,7 +200,7 @@ sub _validate_float {
     $self->_additional_rules($schema, $data, $path);
 }
 
-sub _validate_number {
+sub validate_number {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^[+-]?\d+(\.\d+)?$}) { # XXX combine int+float regexp!
 	$self->_error("Non-valid data `" . $data . "', expected a number");
@@ -206,7 +208,7 @@ sub _validate_number {
     $self->_additional_rules($schema, $data, $path);
 }
 
-sub _validate_bool {
+sub validate_bool {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^(yes|true|1|no|false|0)$}) { # XXX correct?
 	$self->_error("Non-valid data `" . $data . "', expected a boolean");
@@ -214,7 +216,7 @@ sub _validate_bool {
     $self->_additional_rules($schema, $data, $path);
 }
 
-sub _validate_date {
+sub validate_date {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^\d{4}-\d{2}-\d{2}$}) {
 	$self->_error("Non-valid data `" . $data . "', expected a date (YYYY-MM-DD)");
@@ -222,7 +224,7 @@ sub _validate_date {
     $self->_additional_rules($schema, $data, $path);
 }
 
-sub _validate_time {
+sub validate_time {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^\d{2}:\d{2}:\d{2}$}) {
 	$self->_error("Non-valid data `" . $data . "', expected a time (HH:MM:SS)");
@@ -230,16 +232,16 @@ sub _validate_time {
     $self->_additional_rules($schema, $data, $path);
 }
 
-sub _validate_timestamp {
+sub validate_timestamp {
     my($self) = @_;
     $self->_error("timestamp validation NYI"); # XXX
 }
 
-sub _validate_any {
+sub validate_any {
     1;
 }
 
-sub _validate_seq {
+sub validate_seq {
     my($self, $schema, $data, $path) = @_;
     if (!exists $schema->{sequence}) {
 	$self->_die("`sequence' missing with `seq' type");
@@ -261,7 +263,7 @@ sub _validate_seq {
     my $index = 0;
     for my $elem (@$data) {
 	my $subpath = _append_path($path, $index);
-	$self->_validate($subschema, $elem, $subpath, { unique_mapping_val => \%unique_mapping_val});
+	$self->validate($subschema, $elem, $subpath, { unique_mapping_val => \%unique_mapping_val});
 	if ($unique) {
 	    if (exists $unique_val{$elem}) {
 		$self->_error("`$elem' is already used at `$unique_val{$elem}'");
@@ -273,7 +275,7 @@ sub _validate_seq {
     }
 }
 
-sub _validate_map {
+sub validate_map {
     my($self, $schema, $data, $path, $args) = @_;
     my $unique_mapping_val;
     if ($args && $args->{unique_mapping_val}) {
@@ -322,7 +324,7 @@ sub _validate_map {
 	    }
 	}
 
-	$self->_validate($subschema, $data->{$key}, $subpath);
+	$self->validate($subschema, $data->{$key}, $subpath);
 	$seen_key{$key}++;
     }
 
@@ -331,7 +333,7 @@ sub _validate_map {
 	$self->{path} = $subpath;
 	if (!$seen_key{$key}) {
 	    if ($default_key_schema) {
-		$self->_validate($default_key_schema, $val, $subpath);
+		$self->validate($default_key_schema, $val, $subpath);
 	    } else {
 		$self->_error("Unexpected key `$key'");
 	    }
