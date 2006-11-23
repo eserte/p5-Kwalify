@@ -1,7 +1,12 @@
-Kwalify version 1.00
-====================
+Kwalify
+=======
 
-See http://www.kuwata-lab.com/kwalify/users-guide.01.html
+Kwalify is a Perl implementation for validating data structures
+against the Kwalify schema. For a schema definition, see
+http://www.kuwata-lab.com/kwalify/users-guide.01.html
+
+Note that there is no support for validator hooks (section 1-7 of the
+user guide document).
 
 INSTALLATION
 
@@ -12,19 +17,17 @@ To install this module type the following:
    make test
    make install
 
-Or with modern CPAN.pm just:
+Or with modern CPAN.pm ($CPAN::VERSION >= 1.88_55) just:
 
    cpan .
 
-USAGE
+USAGE of the installed program:
 
    pkwalify -f schemafile datafile
 
 schemafile and datafile may be YAML or JSON files.
 
 COPYRIGHT AND LICENCE
-
-Put the correct copyright and licence information here.
 
 Copyright (C) 2006 by Slaven Rezic
 
