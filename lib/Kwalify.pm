@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.6 2006/11/23 20:56:23 eserte Exp $
+# $Id: Kwalify.pm,v 1.7 2006/11/23 21:19:52 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -20,7 +20,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
@@ -374,9 +374,11 @@ sub _get_boolean {
 1;
 __END__
 
+=encoding iso-8859-2
+
 =head1 NAME
 
-Kwalify - schema for data structures
+Kwalify - Kwalify schema for data structures
 
 =head1 SYNOPSIS
 
@@ -402,14 +404,18 @@ B<validate> may be exported.
 
 =head1 AUTHOR
 
-Slaven Rezic, E<lt>srezic@cpan.orgE<gt>
+Slaven Reziæ, E<lt>srezic@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 by Slaven Rezic
+Copyright (C) 2006 by Slaven Reziæ
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
 at your option, any later version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+L<pkwalify>, L<kwalify(1)>.
 
 =cut
