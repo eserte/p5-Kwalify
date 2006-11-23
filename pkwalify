@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify,v 1.2 2006/11/18 00:46:25 eserte Exp $
+# $Id: pkwalify,v 1.3 2006/11/23 20:56:08 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -30,27 +30,40 @@ if (!defined $data_file) {
     usage("datafile is mandatory");
 }
 
-my $schema = read_file($schema_file);
-my $data   = read_file($data_file);
+my(@schema) = read_file($schema_file);
+if (@schema != 1) {
+    die "<$schema_file> does not contain exactly one schema, cannot handle this";
+}
+my $schema = $schema[0];
+my(@data)   = read_file($data_file);
 
-Kwalify::validate($schema, $data);
+my $errors;
+for my $data (@data) {
+    eval { Kwalify::validate($schema, $data) };
+    if ($@) {
+	warn "$@\n";
+	$errors++;
+    }
+}
+
+exit $errors;
 
 sub read_file {
     my $file = shift;
-    my $data;
+    my @data;
     my @errors;
     if (eval { require YAML::Syck; 1 }) {
-	$data = eval { YAML::Syck::LoadFile($file) };
-	return $data if $data && !$@;
+	@data = eval { YAML::Syck::LoadFile($file) };
+	return @data if !$@;
 	push @errors, $@;
     }
     if (eval { require YAML; 1 }) {
-	$data = eval { YAML::LoadFile($file) };
-	return $data if $data && !$@;
+	@data = eval { YAML::LoadFile($file) };
+	return @data if !$@;
 	push @errors, $@;
     }
     if (eval { require JSON; 1 }) {
-	$data = eval {
+	my $data = eval {
 	    open JSON, "< $file"
 		or die "Can't open <$file>: $!";
 	    local $/ = undef;
@@ -58,7 +71,7 @@ sub read_file {
 	    close JSON;
 	    JSON::jsonToObj($json);
 	};
-	return $data if $data && !$@;
+	return ($data) if $data && !$@;
 	push @errors, $@;
     }
     die "Cannot parse <$file>. Cumulated errors:\n" . join("\n", @errors) . "\n";
