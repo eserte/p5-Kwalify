@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.4 2006/11/18 13:16:10 eserte Exp $
+# $Id: Kwalify.t,v 1.5 2006/11/23 20:56:32 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -26,12 +26,14 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 34;
-    plan tests => 1 + $yaml_syck_tests + 2;
+    plan tests => 2 + $yaml_syck_tests + 2;
 }
 
 BEGIN {
     use_ok('Kwalify', 'validate');
 }
+
+use_ok('Schema::Kwalify');
 
 sub is_valid_yaml {
     my($schema, $document, $testname) = @_;

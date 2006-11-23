@@ -9,3 +9,4 @@ t/testdata/document05a.yaml
 t/testdata/document05b.yaml
 t/testdata/schema05.yaml
 lib/Kwalify.pm
+lib/Schema/Kwalify.pm
