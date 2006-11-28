@@ -7,6 +7,7 @@ t/Kwalify.t
 t/pkwalify.t
 t/testdata/document05a.yaml
 t/testdata/document05b.yaml
+t/testdata/kwalify.yaml
 t/testdata/schema05.yaml
 lib/Kwalify.pm
 lib/Schema/Kwalify.pm
