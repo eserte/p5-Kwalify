@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify,v 1.5 2006/11/26 10:43:15 eserte Exp $
+# $Id: pkwalify,v 1.6 2006/11/28 21:04:57 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -15,15 +15,18 @@
 
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf("%d.%02d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
 
 use Kwalify;
 use Getopt::Long;
 
 my $schema_file;
-GetOptions("f=s" => \$schema_file)
+my $silent;
+GetOptions("f=s" => \$schema_file,
+	   "s"   => \$silent,
+	  )
     or usage();
-
+	   
 if (!defined $schema_file) {
     usage("-f option is mandatory");
 }
@@ -35,18 +38,26 @@ if (!defined $data_file) {
 
 my(@schema) = read_file($schema_file);
 if (@schema != 1) {
-    die "<$schema_file> does not contain exactly one schema, cannot handle this";
+    print "<$schema_file> does not contain exactly one schema, cannot handle this.";
+    exit 1;
 }
 my $schema = $schema[0];
 my(@data)   = read_file($data_file);
 
 my $errors = 0;
+my $document_index = 0;
 for my $data (@data) {
+    my $document_label = $data_file . '#' . $document_index;
     eval { Kwalify::validate($schema, $data) };
     if ($@) {
-	warn "$@\n";
+	print "$document_label: INVALID\n$@\n";
 	$errors++;
+    } else {
+	if (!$silent) {
+	    print "$document_label: valid.\n";
+	}
     }
+    $document_index++;
 }
 
 exit $errors;
@@ -84,7 +95,7 @@ sub usage {
     my($msg) = @_;
     $msg .= "\n" if defined $msg;
     die <<EOF;
-${msg}usage: $0 -f schema.yml data.yml
+${msg}usage: $0 [-s] -f schema.yml data.yml
        $0 -f schema.json data.json
 EOF
 }
@@ -99,7 +110,7 @@ pkwalify - Kwalify schema for data structures
 
 =head1 SYNOPSIS
 
-    pkwalify -f schemafile datafile
+    pkwalify [-s] -f schemafile datafile
 
 =head1 DESCRIPTION
 
@@ -109,6 +120,22 @@ L<YAML> or L<JSON> file) against a schema defined with I<schemafile>
 
 The program returns the number of errors found in the datafile. An
 exit status 0 means no errors.
+
+=head2 OPTIONS
+
+=over
+
+=item -f I<schemafile>
+
+Specify a schema file, either as YAML or JSON. Required.
+
+=item -s
+
+Be silent if the document is valid.
+
+=item 
+
+=back
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.5 2006/11/23 20:56:32 eserte Exp $
+# $Id: Kwalify.t,v 1.6 2006/11/28 21:05:10 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -25,7 +25,7 @@ BEGIN {
 
 my $yaml_syck_tests;
 BEGIN {
-    $yaml_syck_tests = 34;
+    $yaml_syck_tests = 36;
     plan tests => 2 + $yaml_syck_tests + 2;
 }
 
@@ -340,6 +340,57 @@ EOF
 		     qr{\Q[/2/name] `bar' is already used at `/1/name'},
 		    ]);
 
+    # Recursive mappings:
+    my $recursive_schema = <<'EOF';
+name:      MAIN
+type:      map
+required:  yes
+mapping:   &main-rule
+  "type":
+    type:      str
+    enum:
+      - map
+      - str
+  "mapping":
+    name:      MAPPING
+    type:      map
+    mapping:
+      =:
+        type:      map
+        mapping:   *main-rule
+        name:      MAIN
+        #required:  yes
+EOF
+    my $non_recursive_document = <<'EOF';
+type: map
+mapping:
+  recursive_hash:
+    type: map
+    mapping:
+      bla:
+        type: str
+      foo:
+        type: str
+  another_key:
+    type: str
+EOF
+    my $recursive_maps = <<'EOF';
+type: map
+mapping:
+  recursive_hash: &recursive
+    type: map
+    mapping:
+      bla:
+        type: str
+      foo:
+        type: str
+      bar: *recursive
+  another_key:
+    type: str
+EOF
+
+    is_valid_yaml($recursive_schema, $non_recursive_document, "valid data against schema with recursive rules (no endless loop)");
+    is_valid_yaml($recursive_schema, $recursive_maps, "valid recursive data against schema with recursive rules (no endless loop)");
 }
 
 {

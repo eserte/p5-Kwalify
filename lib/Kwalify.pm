@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.8 2006/11/26 10:45:06 eserte Exp $
+# $Id: Kwalify.pm,v 1.9 2006/11/28 21:05:05 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -20,7 +20,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.8 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
@@ -35,7 +35,7 @@ sub validate ($$) {
     my $self = Kwalify::Validator->new;
     $self->validate($schema, $data, "/");
     if (@{$self->{errors}}) {
-	die join("\n", @{$self->{errors}}) . "\n";
+	die join("\n", map { "  - $_" } @{$self->{errors}}) . "\n";
     } else {
 	1;
     }
@@ -43,12 +43,20 @@ sub validate ($$) {
 
 package Kwalify::Validator;
 
+use overload ();
+
 sub new {
     my($class) = @_;
     bless { errors => [] }, $class;
 }
 
 sub validate {
+    my($self, $schema, $data, $path, $args) = @_;
+    $self->{done} = {};
+    $self->_validate($schema, $data, $path, $args);
+}
+
+sub _validate {
     my($self, $schema, $data, $path, $args) = @_;
     $self->{path} = $path;
 
@@ -216,6 +224,11 @@ sub validate_bool {
     $self->_additional_rules($schema, $data, $path);
 }
 
+# XXX is this correct?
+sub validate_scalar {
+    shift->validate_text(@_);
+}
+
 sub validate_date {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^\d{4}-\d{2}-\d{2}$}) {
@@ -255,7 +268,12 @@ sub validate_seq {
     }
     if (!UNIVERSAL::isa($data, 'ARRAY')) {
 	$self->_error("Non-valid data " . $data . ", expected sequence");
+	return;
     }
+
+    return if ($self->{done}{overload::StrVal($data)}{overload::StrVal($schema)});
+    $self->{done}{overload::StrVal($data)}{overload::StrVal($schema)} = 1;
+
     my $subschema = $sequence->[0];
     my $unique = _get_boolean($subschema->{unique});
     my %unique_val;
@@ -263,7 +281,7 @@ sub validate_seq {
     my $index = 0;
     for my $elem (@$data) {
 	my $subpath = _append_path($path, $index);
-	$self->validate($subschema, $elem, $subpath, { unique_mapping_val => \%unique_mapping_val});
+	$self->_validate($subschema, $elem, $subpath, { unique_mapping_val => \%unique_mapping_val});
 	if ($unique) {
 	    if (exists $unique_val{$elem}) {
 		$self->_error("`$elem' is already used at `$unique_val{$elem}'");
@@ -291,9 +309,19 @@ sub validate_map {
     if (!UNIVERSAL::isa($data, 'HASH')) {
 	$self->_error("Non-valid data " . $data . ", expected mapping");
     }
+
+    return if ($self->{done}{overload::StrVal($data)}{overload::StrVal($schema)});
+    $self->{done}{overload::StrVal($data)}{overload::StrVal($schema)} = 1;
+
     my %seen_key;
     my $default_key_schema;
-    while(my($key,$subschema) = each %$mapping) {
+
+    ## Originally this was an each-loop, but this could lead into
+    ## endless recursions, because mapping may be reused in Kwalify,
+    ## thus the each iterator was shared between recursion levels.
+    # while(my($key,$subschema) = each %$mapping) {
+    for my $key (keys %$mapping) {
+	my $subschema = $mapping->{$key};
 	if ($key eq '=') { # the "default" key
 	    $default_key_schema = $subschema;
 	    next;
@@ -324,16 +352,18 @@ sub validate_map {
 	    }
 	}
 
-	$self->validate($subschema, $data->{$key}, $subpath);
+	$self->_validate($subschema, $data->{$key}, $subpath);
 	$seen_key{$key}++;
     }
 
-    while(my($key,$val) = each %$data) {
+#    while(my($key,$val) = each %$data) {
+    for my $key (keys %$data) {
+	my $val = $data->{$key};
 	my $subpath = _append_path($path, $key);
 	$self->{path} = $subpath;
 	if (!$seen_key{$key}) {
 	    if ($default_key_schema) {
-		$self->validate($default_key_schema, $val, $subpath);
+		$self->_validate($default_key_schema, $val, $subpath);
 	    } else {
 		$self->_error("Unexpected key `$key'");
 	    }

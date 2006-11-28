@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.5 2006/11/23 20:56:45 eserte Exp $
+# $Id: pkwalify.t,v 1.6 2006/11/28 21:05:14 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -67,10 +67,10 @@ my $v;
 GetOptions("v!")
     or die "usage: $0 [-v]";
 
-plan tests => scalar(@yaml_syck_defs) + scalar(@json_defs);
+plan tests => 3*(scalar(@yaml_syck_defs) + scalar(@json_defs));
 
 my $script = "pkwalify";
-my @cmd = ($^X, "-Mblib", $script);
+my @cmd = ($^X, "-Mblib", $script, "-s");
 
 SKIP: {
     skip("Need YAML::Syck for tests", scalar(@yaml_syck_defs))
@@ -108,13 +108,20 @@ sub any_test {
 	my($stdin,$stdout,$stderr);
 	if (!IPC::Run::run(\@cmd, \$stdin, \$stdout, \$stderr)) {
 	    $valid = 0;
-	    diag $stderr if $v;
+	    diag "STDOUT=$stdout\nSTDERR=$stderr\n" if $v;
 	} else {
 	    $valid = 1;
 	}
+	if ($valid) {
+	    is($stdout, "", "No warnings in @cmd");
+	} else {
+	    isnt($stdout, "", "There are warnings in @cmd");
+	}
+	is($stderr, "", "Nothing in STDERR");
     } else {
 	system(@cmd);
 	$valid = $? == 0 ? 1 : 0;
+    SKIP: { skip("No stdout test without IPC::Run", 2) }
     }
     is($valid, $expect_validity, "@cmd")
 	or diag("@cmd");
