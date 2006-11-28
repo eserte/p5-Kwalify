@@ -1,14 +1,14 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.9 2006/11/28 21:05:05 eserte Exp $
+# $Id: Kwalify.pm,v 1.10 2006/11/28 23:04:04 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
-# Mail: slaven@rezic.de
+# Mail: srezic@cpan.org
 # WWW:  http://www.rezic.de/eserte/
 #
 
@@ -20,7 +20,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.9 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.10 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
