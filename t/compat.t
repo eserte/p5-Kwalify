@@ -2,9 +2,13 @@
 # -*- perl -*-
 
 #
-# $Id: compat.t,v 1.1 2006/12/02 10:45:04 eserte Exp $
+# $Id: compat.t,v 1.2 2006/12/02 10:46:44 eserte Exp $
 # Author: Slaven Rezic
 #
+
+# This test is just for older perls (5.004, 5.005)
+# because the other test scripts in this suite have
+# too large prerequisites (Test::More, \Q in regexpes...)
 
 use strict;
 use Kwalify qw(validate);
