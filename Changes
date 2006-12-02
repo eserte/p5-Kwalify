@@ -1,5 +1,8 @@
 Revision history for Perl extension Kwalify.
 
+1.12
+	- added another test for older perls
+
 1.11
 	- fixed another test problem (occurred if
 	  IPC::Run was not installed)
