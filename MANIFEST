@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST
 README
 pkwalify
+t/compat.t
 t/Kwalify.t
 t/pkwalify.t
 t/testdata/document05a.yaml
