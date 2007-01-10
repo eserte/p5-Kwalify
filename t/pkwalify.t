@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.7 2006/12/02 10:03:18 eserte Exp $
+# $Id: pkwalify.t,v 1.8 2007/01/10 22:51:24 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -68,7 +68,7 @@ GetOptions("v!")
     or die "usage: $0 [-v]";
 
 my $tests_per_case = 3;
-plan tests => 1 + $tests_per_case*(scalar(@yaml_syck_defs) + scalar(@json_defs));
+plan tests => 13 + $tests_per_case*(scalar(@yaml_syck_defs) + scalar(@json_defs));
 
 my $script = "$FindBin::RealBin/../blib/script/pkwalify";
 my @cmd = ($^X, "-Mblib=$FindBin::RealBin/..", $script, "-s");
@@ -91,6 +91,75 @@ SKIP: {
     }
 }
 
+{
+    my $result = run_pkwalify();
+    is($result->{success}, 0, "No success without options");
+ SKIP: {
+	skip("Skip STDERR test", 1) if !$result->{can_capture};
+	like($result->{stderr}, qr{-f option is mandatory}, "usage -f");
+    }
+}
+
+{
+    my $result = run_pkwalify("-xxx");
+    is($result->{success}, 0, "Invalid option");
+ SKIP: {
+	skip("Skip STDERR test", 1) if !$result->{can_capture};
+	like($result->{stderr}, qr{usage}, "got usage");
+    }
+}
+
+{
+    my $result = run_pkwalify("-f", "foo");
+    is($result->{success}, 0, "Missing data file");
+ SKIP: {
+	skip("Skip STDERR test", 1) if !$result->{can_capture};
+	like($result->{stderr}, qr{datafile is mandatory}, "usage datafile");
+    }
+}
+
+{
+    my $result = run_pkwalify("-f", $0, $0);
+    is($result->{success}, 0, "No YAML/JSON file");
+ SKIP: {
+	skip("Skip STDERR test", 1) if !$result->{can_capture};
+	like($result->{stderr}, qr{cannot parse}i, "cannot parse file");
+    }
+}
+
+SKIP: {
+    skip("Need YAML::Syck for tests", 4)
+	if !eval { require YAML::Syck; 1 };
+
+    my $schema_file = "schema05.yaml";
+    my $data_file   = "document05a.yaml";
+    for ($schema_file, $data_file) {
+	if (!File::Spec->file_name_is_absolute($_)) {
+	    $_ = "$FindBin::RealBin/testdata/$_";
+	}
+    }
+
+    {
+	my @args = ('-f', $schema_file, $data_file, '-s');
+	my $result = run_pkwalify_non_silent(@args);
+	is($result->{success}, 1, "Success with -s");
+    SKIP: {
+	    skip("Skip STDOUT test", 1) if !$result->{can_capture};
+	    is($result->{stdout}, "", "silent output");
+	}
+    }
+
+    {
+	my @args = ('-f', $schema_file, $data_file);
+	my $result = run_pkwalify_non_silent(@args);
+	is($result->{success}, 1, "Success without -s");
+    SKIP: {
+	    skip("Skip STDOUT test", 1) if !$result->{can_capture};
+	    like($result->{stdout}, qr{\Q: valid.}, "non-silent output for validity");
+	}
+    }
+}
+
 sub any_test {
     my($def) = @_;
     local $Test::Builder::Level = $Test::Builder::Level+1;
@@ -101,24 +170,36 @@ sub any_test {
 	}
     }
     
-    my @cmd = @cmd;
-    push @cmd, '-f' => $schema_file, $data_file;
+    my @args = ('-f' => $schema_file, $data_file);
 
-    my $valid;
-    if (eval { require IPC::Run; 1 }) {
-	my($stdin,$stdout,$stderr);
-	if (!IPC::Run::run(\@cmd, \$stdin, \$stdout, \$stderr)) {
-	    $valid = 0;
+    my $result = run_pkwalify(@args);
+
+    my($valid, $stdin, $stdout, $stderr, $can_capture) =
+	@{$result}{qw(success stdin stdout stderr can_capture)};
+
+    if ($can_capture) {
+	if (!$valid) {
 	    diag "STDOUT=$stdout\nSTDERR=$stderr\n" if $v;
-	} else {
-	    $valid = 1;
 	}
 	if ($valid) {
-	    is($stdout, "", "No warnings in @cmd");
+	    is($stdout, "", "No warnings in @args");
 	} else {
-	    isnt($stdout, "", "There are warnings in @cmd");
+	    isnt($stdout, "", "There are warnings in @args");
 	}
 	is($stderr, "", "Nothing in STDERR");
+    } else {
+    SKIP: { skip("No stdout/stderr tests without IPC::Run", 2) }
+    }
+    is($valid, $expect_validity, "@args")
+	or diag("@args");
+}
+
+sub _run_pkwalify {
+    my(@cmd) = @_;
+    my($success,$stdin,$stdout,$stderr,$can_capture);
+    if (eval { require IPC::Run; 1 }) {
+	$can_capture = 1;
+	$success = IPC::Run::run(\@cmd, \$stdin, \$stdout, \$stderr) ? 1 : 0;
     } elsif (eval { require IPC::Open3; 1 }) {
 	*OLDOUT = *OLDOUT; # cease -w
 	*OLDERR = *OLDERR; # cease -w
@@ -132,11 +213,32 @@ sub any_test {
 	open(STDERR, ">&OLDERR") or die $!;
 	open(STDOUT, ">&OLDOUT") or die $!;
 
-	$valid = $? == 0 ? 1 : 0;
-    SKIP: { skip("No stdout/stderr tests without IPC::Run", 2) }
+	$success = $? == 0 ? 1 : 0;
+    } else {
+	# Should not happen, every perl5 installation should have
+	# IPC::Open3
+	warn "Cannot test, no IPC::Run and/or IPC::Open3 available";
     }
-    is($valid, $expect_validity, "@cmd")
-	or diag("@cmd");
+
+    return { success => $success,
+	     stdin   => $stdin,
+	     stdout  => $stdout,
+	     stderr  => $stderr,
+	     can_capture => $can_capture,
+	   };
+}
+
+sub run_pkwalify {
+    my(@args) = @_;
+    my @cmd = (@cmd, @args);
+    _run_pkwalify(@cmd);
+}
+
+sub run_pkwalify_non_silent {
+    my(@args) = @_;
+    my(@cmd) = grep { $_ ne '-s' } @cmd;
+    push @cmd, @args;
+    _run_pkwalify(@cmd);
 }
 
 # Should be last because of STDERR redirection
