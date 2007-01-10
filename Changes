@@ -1,5 +1,9 @@
 Revision history for Perl extension Kwalify.
 
+1.13
+	- fixed bug in range/max test
+	- better test coverage
+
 1.12
 	- added another test for older perls
 
