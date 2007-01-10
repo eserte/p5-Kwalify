@@ -1,10 +1,10 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.15 2007/01/10 22:14:52 eserte Exp $
+# $Id: Kwalify.pm,v 1.16 2007/01/10 22:21:12 eserte Exp $
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -21,7 +21,7 @@ use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
 $VERSION = '1.13';
-# sprintf("%d.%02d", q$Revision: 1.15 $ =~ /(\d+)\.(\d+)/);
+# sprintf("%d.%02d", q$Revision: 1.16 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
