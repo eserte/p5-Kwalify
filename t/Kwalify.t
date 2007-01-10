@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.7 2007/01/10 22:14:05 eserte Exp $
+# $Id: Kwalify.t,v 1.8 2007/01/10 22:51:45 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -26,7 +26,7 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 36;
-    plan tests => 2 + $yaml_syck_tests + 24;
+    plan tests => 2 + $yaml_syck_tests + 27;
 }
 
 BEGIN {
@@ -629,6 +629,15 @@ EOF
 		     range => "foo"}, "foo") };
     like($@, qr{range.* must be a hash with keys max and/or min}, "invalid range spec");
 
+}
+
+{
+    # Schema::Kwalify tests
+    my $sk = Schema::Kwalify->new;
+    isa_ok($sk, "Schema::Kwalify");
+    ok($sk->validate({type=>"text"},"foo"), "Simple Schema::Kwalify validation");
+    eval { $sk->validate({type=>"text"},[]) };
+    isnt($@, "", "Simple Schema::Kwalify failure");
 }
 
 __END__
