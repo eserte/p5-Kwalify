@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.13 2006/12/16 10:42:39 eserte Exp $
+# $Id: Kwalify.pm,v 1.14 2007/01/10 22:14:24 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006 Slaven Rezic. All rights reserved.
@@ -21,7 +21,7 @@ use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
 $VERSION = '1.12';
-# sprintf("%d.%02d", q$Revision: 1.13 $ =~ /(\d+)\.(\d+)/);
+# sprintf("%d.%02d", q$Revision: 1.14 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
@@ -110,7 +110,7 @@ sub _additional_rules {
 	}
 	if (exists $schema->{'length'}->{'max-ex'}) {
 	    my $max = $schema->{'length'}->{'max-ex'};
-	    if ($length > $max) {
+	    if ($length >= $max) {
 		$self->_error("`$data' is too long (length $length >= max $max)");
 	    }
 	}
