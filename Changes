@@ -2,6 +2,7 @@ Revision history for Perl extension Kwalify.
 
 1.13
 	- fixed bug in range/max test
+	- fixed bug in Schema::Kwalify::validate
 	- better test coverage
 
 1.12
