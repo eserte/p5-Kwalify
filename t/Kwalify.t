@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.6 2006/11/28 21:05:10 eserte Exp $
+# $Id: Kwalify.t,v 1.7 2007/01/10 22:14:05 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -26,7 +26,7 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 36;
-    plan tests => 2 + $yaml_syck_tests + 2;
+    plan tests => 2 + $yaml_syck_tests + 24;
 }
 
 BEGIN {
@@ -484,6 +484,151 @@ EOF
     ok(validate($schema06_pl, $document06a_pl), "valid data against perl schema");
     eval { validate($schema06_pl, $document06b_pl) };
     ok($@, "invalid data against perl schema");
+}
+
+{
+    # test length/range min/max-ex
+    # (no tests in original document)
+
+    my $schema_ex =
+	{
+	 type => "map",
+	 mapping =>
+	 {
+	  password =>
+	  {
+	   type => "text",
+	   length => { 'max-ex' => 16, 'min-ex' => 8 },
+	  },
+	  age =>
+	  {
+	   type => "int",
+	   range => { 'max-ex' => 30, 'min-ex' => 18 },
+	  },
+	 }
+	};
+
+    my $document_length_min_ex_pass =
+	{ password => "123456789" };
+    ok(validate($schema_ex, $document_length_min_ex_pass), "min-ex length pass");
+
+    my $document_length_min_ex_fail =
+	{ password => "12345678" };
+    eval { validate($schema_ex, $document_length_min_ex_fail) };
+    like($@, qr{\Qis too short (length 8 <= min 8)}, "min-ex length fail");
+
+    my $document_length_max_ex_pass =
+	{ password => "123456789012345" };
+    ok(validate($schema_ex, $document_length_max_ex_pass), "max-ex length pass");
+
+    my $document_length_max_ex_fail =
+	{ password => "1234567890123456" };
+    eval { validate($schema_ex, $document_length_max_ex_fail) };
+    like($@, qr{\Qis too long (length 16 >= max 16)}, "max-ex length fail");
+
+    ######################################################################
+
+    my $document_range_min_ex_pass =
+	{ age => 19 };
+    ok(validate($schema_ex, $document_range_min_ex_pass), "min-ex range pass");
+
+    my $document_range_min_ex_fail =
+	{ age => 18 };
+    eval { validate($schema_ex, $document_range_min_ex_fail) };
+    like($@, qr{\Qis too small (<= min 18)}, "min-ex range fail");
+
+    my $document_range_max_ex_pass =
+	{ age => 29 };
+    ok(validate($schema_ex, $document_range_max_ex_pass), "max-ex range pass");
+
+    my $document_range_max_ex_fail =
+	{ age => 30 };
+    eval { validate($schema_ex, $document_range_max_ex_fail) };
+    like($@, qr{\Qis too large (>= max 30)}, "max-ex range fail");
+}
+
+{
+    # missing length/range max tests
+    my $schema =
+	{
+	 type => "map",
+	 mapping =>
+	 {
+	  password =>
+	  {
+	   type => "text",
+	   length => { 'max' => 16, 'min-ex' => 8 },
+	  },
+	  age =>
+	  {
+	   type => "int",
+	   range => { 'max' => 16, 'min-ex' => 8 },
+	  },
+	 }
+	};
+
+    my $document_length_max_pass =
+	{ password => "1234567890123456" };
+    ok(validate($schema, $document_length_max_pass), "max length pass");
+
+    my $document_length_max_fail =
+	{ password => "12345678901234567" };
+    eval { validate($schema, $document_length_max_fail) };
+    like($@, qr{\Qis too long (length 17 > max 16)}, "max length fail");
+
+    my $document_range_max_pass =
+	{ age => 16 };
+    ok(validate($schema, $document_range_max_pass), "max range pass");
+
+    my $document_range_max_fail =
+	{ age => 17 };
+    eval { validate($schema, $document_range_max_fail) };
+    like($@, qr{\Qis too large (> max 16)}, "max range fail");
+}
+
+{
+    # Some validation tests
+    eval { validate({type => "text"}, [qw(a ref is not a text)]) };
+    like($@, qr{Non-valid data}, "a ref is not a text");
+
+    eval { validate({type => "text"}, undef) };
+    like($@, qr{Non-valid data.*undef}, "undef is not a text");
+
+    eval { validate({type => "str"}, [qw(a ref is not a str)]) };
+    like($@, qr{Non-valid data}, "a str is not a text");
+
+    eval { validate({type => "str"}, undef) };
+    like($@, qr{Non-valid data.*undef}, "undef is not a str");
+
+    eval { validate({type => "str"}, 1.2) };
+    like($@, qr{Non-valid data}, "a number is not a str");
+}
+
+# Missing spec for float
+# Missing spec for number
+# Missing spec for bool
+
+{
+    # Various schema error conditions
+
+    eval { validate([qw(schema not a hash)], {}) };
+    like($@, qr{Schema structure must be a hash reference}, "schema must be hash");
+
+    eval { validate({type=>"unknown"},{}) };
+    like($@, qr{Invalid or unimplemented type .*unknown}, "unknown type");
+
+    eval { validate({type=>"text",
+		     length => "foo"}, "foo") };
+    like($@, qr{length.* must be a hash with keys max and/or min}, "invalid length spec");
+
+    eval { validate({type=>"text",
+		     enum=>"not an array"}, "foo") };
+    like($@, qr{must be an array}, "invalid enum spec");
+
+    eval { validate({type=>"text",
+		     range => "foo"}, "foo") };
+    like($@, qr{range.* must be a hash with keys max and/or min}, "invalid range spec");
+
 }
 
 __END__
