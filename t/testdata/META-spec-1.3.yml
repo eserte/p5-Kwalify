@@ -11,7 +11,7 @@ mapping:
         required: no
       url: &required_url
         type: text
-        pattern: /^(ftp|https?):\/\//
+        pattern: /^((ftp|https?):\/\/|mailto:.*@)/
         required: yes
   name:
     type: text
@@ -117,7 +117,7 @@ mapping:
     mapping:
       license: &optional_url
         type: text
-        pattern: /^(ftp|https?):\/\//
+        pattern: /^((ftp|https?):\/\/|mailto:.*@)/
         required: no
       homepage: *optional_url
       bugtracker: *optional_url
