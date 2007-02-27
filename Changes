@@ -1,5 +1,13 @@
 Revision history for Perl extension Kwalify.
 
+1.15
+	- include experimental META.yml spec (version 1.3) to test directory
+	- new -v version in pkwalify
+
+1.14
+	- stricter checks if schema itself is correct
+	  (croak on unhandled keys)
+
 1.13
 	- fixed bug in range/max test
 	- fixed bug in Schema::Kwalify::validate
