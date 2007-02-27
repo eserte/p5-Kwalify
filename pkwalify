@@ -2,10 +2,10 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify,v 1.6 2006/11/28 21:04:57 eserte Exp $
+# $Id: pkwalify,v 1.7 2007/02/27 22:02:41 eserte Exp $
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,18 +15,25 @@
 
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
 
 use Kwalify;
 use Getopt::Long;
 
 my $schema_file;
 my $silent;
-GetOptions("f=s" => \$schema_file,
-	   "s"   => \$silent,
+my $show_version;
+GetOptions("f=s"       => \$schema_file,
+	   "s|silent"  => \$silent,
+	   "v|version" => \$show_version,
 	  )
     or usage();
 	   
+if ($show_version) {
+    version();
+    exit;
+}
+
 if (!defined $schema_file) {
     usage("-f option is mandatory");
 }
@@ -95,8 +102,16 @@ sub usage {
     my($msg) = @_;
     $msg .= "\n" if defined $msg;
     die <<EOF;
-${msg}usage: $0 [-s] -f schema.yml data.yml
+${msg}usage: $0 [-v] [-s] -f schema.yml data.yml
        $0 -f schema.json data.json
+EOF
+}
+
+sub version {
+    print <<EOF;
+pkwalify $VERSION
+Kwalify.pm $Kwalify::VERSION
+perl $]
 EOF
 }
 
@@ -110,7 +125,7 @@ pkwalify - Kwalify schema for data structures
 
 =head1 SYNOPSIS
 
-    pkwalify [-s] -f schemafile datafile
+    pkwalify [-v] [-s] -f schemafile datafile
 
 =head1 DESCRIPTION
 
@@ -132,6 +147,10 @@ Specify a schema file, either as YAML or JSON. Required.
 =item -s
 
 Be silent if the document is valid.
+
+=item -v
+
+Show script and module versions and exit.
 
 =item 
 
