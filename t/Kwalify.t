@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.8 2007/01/10 22:51:45 eserte Exp $
+# $Id: Kwalify.t,v 1.9 2007/02/27 23:39:26 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -26,7 +26,7 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 36;
-    plan tests => 2 + $yaml_syck_tests + 27;
+    plan tests => 2 + $yaml_syck_tests + 31;
 }
 
 BEGIN {
@@ -587,6 +587,14 @@ EOF
 }
 
 {
+    ok(validate({type=>"text",
+		 name=>"A schema name",
+		 classname=>"TestClass",
+		 desc=>"Just testing the description.\nReally!",
+		}, "foo"), "Passing name/classname/desc");
+}
+
+{
     # Some validation tests
     eval { validate({type => "text"}, [qw(a ref is not a text)]) };
     like($@, qr{Non-valid data}, "a ref is not a text");
@@ -629,6 +637,17 @@ EOF
 		     range => "foo"}, "foo") };
     like($@, qr{range.* must be a hash with keys max and/or min}, "invalid range spec");
 
+    eval { validate({type=>"text",
+		     unknown_key => "foo"}, "foo") };
+    like($@, qr{Unexpected key `unknown_key' in type specification}, "unknown key in type");
+
+    eval { validate({type=>"int",
+		     range=>{foo => 1}}, "foo") };
+    like($@, qr{Unexpected key `foo' in range specification}, "unknown key in range");
+
+    eval { validate({type=>"int",
+		     length=>{foo => 1}}, "foo") };
+    like($@, qr{Unexpected key `foo' in length specification}, "unknown key in length");
 }
 
 {
