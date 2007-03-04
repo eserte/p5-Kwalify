@@ -1,7 +1,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.pm,v 1.17 2007/02/27 23:39:12 eserte Exp $
+# $Id: Kwalify.pm,v 1.18 2007/03/04 10:33:20 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006,2007 Slaven Rezic. All rights reserved.
@@ -21,7 +21,7 @@ use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
 $VERSION = '1.15';
-# sprintf("%d.%02d", q$Revision: 1.17 $ =~ /(\d+)\.(\d+)/);
+# sprintf("%d.%02d", q$Revision: 1.18 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
@@ -71,7 +71,7 @@ sub _validate {
     }
     my $type_check_method = "validate_" . $type;
     if (!$self->can($type_check_method)) {
-	$self->_die("Invalid or unimplemented type `$type'");
+	$self->_die("Invalid or unimplemented type '$type'");
     }
 
     $self->$type_check_method($schema, $data, $path, $args);
@@ -84,49 +84,49 @@ sub _additional_rules {
 	    if ($schema_key eq 'pattern') {
 		(my $pattern = $schema->{pattern}) =~ s{^/(.*)/$}{$1};
 		if ($data !~ qr{$pattern}) {
-		    $self->_error("Non-valid data `$data' does not match /$pattern/");
+		    $self->_error("Non-valid data '$data' does not match /$pattern/");
 		}
 	    } elsif ($schema_key eq 'length') {
 		if (!UNIVERSAL::isa($schema->{'length'}, "HASH")) {
-		    $self->_die("`length' must be a hash with keys max and/or min");
+		    $self->_die("'length' must be a hash with keys max and/or min");
 		}
 		my $length = length($data);
 		for my $sub_schema_key (keys %{ $schema->{'length'} }) {
 		    if ($sub_schema_key eq 'min') {
 			my $min = $schema->{'length'}->{min};
 			if ($length < $min) {
-			    $self->_error("`$data' is too short (length $length < min $min)");
+			    $self->_error("'$data' is too short (length $length < min $min)");
 			}
 		    } elsif ($sub_schema_key eq 'min-ex') {
 			my $min = $schema->{'length'}->{'min-ex'};
 			if ($length <= $min) {
-			    $self->_error("`$data' is too short (length $length <= min $min)");
+			    $self->_error("'$data' is too short (length $length <= min $min)");
 			}
 		    } elsif ($sub_schema_key eq 'max') {
 			my $max = $schema->{'length'}->{max};
 			if ($length > $max) {
-			    $self->_error("`$data' is too long (length $length > max $max)");
+			    $self->_error("'$data' is too long (length $length > max $max)");
 			}
 		    } elsif ($sub_schema_key eq 'max-ex') {
 			my $max = $schema->{'length'}->{'max-ex'};
 			if ($length >= $max) {
-			    $self->_error("`$data' is too long (length $length >= max $max)");
+			    $self->_error("'$data' is too long (length $length >= max $max)");
 			}
 		    } else {
-			$self->_die("Unexpected key `$sub_schema_key' in length specification, expected min, max, min-ex and/or max-ex");
+			$self->_die("Unexpected key '$sub_schema_key' in length specification, expected min, max, min-ex and/or max-ex");
 		    }
 		}
 	    } elsif ($schema_key eq 'enum') {
 		if (!UNIVERSAL::isa($schema->{enum}, 'ARRAY')) {
-		    $self->_die("`enum' must be an array");
+		    $self->_die("'enum' must be an array");
 		}
 		my %valid = map { ($_,1) } @{ $schema->{enum} };
 		if (!exists $valid{$data}) {
-		    $self->_error("`$data': invalid " . _base_path($path) . " value");
+		    $self->_error("'$data': invalid " . _base_path($path) . " value");
 		}
 	    } elsif ($schema_key eq 'range') {
 		if (!UNIVERSAL::isa($schema->{range}, "HASH")) {
-		    $self->_die("`range' must be a hash with keys max and/or min");
+		    $self->_die("'range' must be a hash with keys max and/or min");
 		}
 		my($lt, $le, $gt, $ge);
 		## yes? no?
@@ -151,31 +151,31 @@ sub _additional_rules {
 		    if ($sub_schema_key eq 'min') {
 			my $min = $schema->{range}->{min};
 			if ($lt->($data, $min)) {
-			    $self->_error("`$data' is too small (< min $min)");
+			    $self->_error("'$data' is too small (< min $min)");
 			}
 		    } elsif ($sub_schema_key eq 'min-ex') {
 			my $min = $schema->{range}->{'min-ex'};
 			if ($le->($data, $min)) {
-			    $self->_error("`$data' is too small (<= min $min)");
+			    $self->_error("'$data' is too small (<= min $min)");
 			}
 		    } elsif ($sub_schema_key eq 'max') {
 			my $max = $schema->{range}->{max};
 			if ($gt->($data, $max)) {
-			    $self->_error("`$data' is too large (> max $max)");
+			    $self->_error("'$data' is too large (> max $max)");
 			}
 		    } elsif ($sub_schema_key eq 'max-ex') {
 			my $max = $schema->{range}->{'max-ex'};
 			if ($ge->($data, $max)) {
-			    $self->_error("`$data' is too large (>= max $max)");
+			    $self->_error("'$data' is too large (>= max $max)");
 			}
 		    } else {
-			$self->_die("Unexpected key `$sub_schema_key' in range specification, expected min, max, min-ex and/or max-ex");
+			$self->_die("Unexpected key '$sub_schema_key' in range specification, expected min, max, min-ex and/or max-ex");
 		    }
 		}
 	    } elsif ($schema_key eq 'assert') {
-		$self->_die("`assert' is not yet implemented");
+		$self->_die("'assert' is not yet implemented");
 	    } elsif ($schema_key !~ m{^(type|required|unique|name|classname|desc)$}) {
-		$self->_die("Unexpected key `$schema_key' in type specification");
+		$self->_die("Unexpected key '$schema_key' in type specification");
 	    }
 	}
     }
@@ -184,7 +184,7 @@ sub _additional_rules {
 sub validate_text {
     my($self, $schema, $data, $path) = @_;
     if (!defined $data || ref $data) {
-	return $self->_error("Non-valid data `" . (defined $data ? $data : 'undef') . "', expected text");
+	return $self->_error("Non-valid data '" . (defined $data ? $data : 'undef') . "', expected text");
     }
     $self->_additional_rules($schema, $data, $path);
 }
@@ -192,7 +192,7 @@ sub validate_text {
 sub validate_str {
     my($self, $schema, $data, $path) = @_;
     if (!defined $data || ref $data || $data =~ m{^\d+(\.\d+)?$}) {
-	return $self->_error("Non-valid data `" . (defined $data ? $data : 'undef') . "', expected a str");
+	return $self->_error("Non-valid data '" . (defined $data ? $data : 'undef') . "', expected a str");
     }
     $self->_additional_rules($schema, $data, $path);
 }
@@ -200,7 +200,7 @@ sub validate_str {
 sub validate_int {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^[+-]?\d+$}) { # XXX what about scientific notation?
-	$self->_error("Non-valid data `" . $data . "', expected an int");
+	$self->_error("Non-valid data '" . $data . "', expected an int");
     }
     $self->_additional_rules($schema, $data, $path);
 }
@@ -208,7 +208,7 @@ sub validate_int {
 sub validate_float {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^[+-]?\d+\.\d+$}) { # XXX other values?
-	$self->_error("Non-valid data `" . $data . "', expected a float");
+	$self->_error("Non-valid data '" . $data . "', expected a float");
     }
     $self->_additional_rules($schema, $data, $path);
 }
@@ -216,7 +216,7 @@ sub validate_float {
 sub validate_number {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^[+-]?\d+(\.\d+)?$}) { # XXX combine int+float regexp!
-	$self->_error("Non-valid data `" . $data . "', expected a number");
+	$self->_error("Non-valid data '" . $data . "', expected a number");
     }
     $self->_additional_rules($schema, $data, $path);
 }
@@ -224,7 +224,7 @@ sub validate_number {
 sub validate_bool {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^(yes|true|1|no|false|0)$}) { # XXX correct?
-	$self->_error("Non-valid data `" . $data . "', expected a boolean");
+	$self->_error("Non-valid data '" . $data . "', expected a boolean");
     }
     $self->_additional_rules($schema, $data, $path);
 }
@@ -237,7 +237,7 @@ sub validate_scalar {
 sub validate_date {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^\d{4}-\d{2}-\d{2}$}) {
-	$self->_error("Non-valid data `" . $data . "', expected a date (YYYY-MM-DD)");
+	$self->_error("Non-valid data '" . $data . "', expected a date (YYYY-MM-DD)");
     }
     $self->_additional_rules($schema, $data, $path);
 }
@@ -245,7 +245,7 @@ sub validate_date {
 sub validate_time {
     my($self, $schema, $data, $path) = @_;
     if ($data !~ m{^\d{2}:\d{2}:\d{2}$}) {
-	$self->_error("Non-valid data `" . $data . "', expected a time (HH:MM:SS)");
+	$self->_error("Non-valid data '" . $data . "', expected a time (HH:MM:SS)");
     }
     $self->_additional_rules($schema, $data, $path);
 }
@@ -262,11 +262,11 @@ sub validate_any {
 sub validate_seq {
     my($self, $schema, $data, $path) = @_;
     if (!exists $schema->{sequence}) {
-	$self->_die("`sequence' missing with `seq' type");
+	$self->_die("'sequence' missing with 'seq' type");
     }
     my $sequence = $schema->{sequence};
     if (!UNIVERSAL::isa($sequence, 'ARRAY')) {
-	$self->_die("Expected array in `sequence'");
+	$self->_die("Expected array in 'sequence'");
     }
     if (@$sequence != 1) {
 	$self->_die("Expect exactly one element in sequence");
@@ -289,7 +289,7 @@ sub validate_seq {
 	$self->_validate($subschema, $elem, $subpath, { unique_mapping_val => \%unique_mapping_val});
 	if ($unique) {
 	    if (exists $unique_val{$elem}) {
-		$self->_error("`$elem' is already used at `$unique_val{$elem}'");
+		$self->_error("'$elem' is already used at '$unique_val{$elem}'");
 	    } else {
 		$unique_val{$elem} = $subpath;
 	    }
@@ -305,11 +305,11 @@ sub validate_map {
 	$unique_mapping_val = $args->{unique_mapping_val};
     }
     if (!exists $schema->{mapping}) {
-	$self->_die("`mapping' missing with `map' type");
+	$self->_die("'mapping' missing with 'map' type");
     }
     my $mapping = $schema->{mapping};
     if (!UNIVERSAL::isa($mapping, 'HASH')) {
-	$self->_die("Expected hash in `mapping'");
+	$self->_die("Expected hash in 'mapping'");
     }
     if (!defined $data) {
 	$self->_error("Undefined data, expected mapping");
@@ -344,7 +344,7 @@ sub validate_map {
 	if (!exists $data->{$key}) {
 	    if ($required) {
 		$self->{path} = $path;
-		$self->_error("Expected required key `$key'");
+		$self->_error("Expected required key '$key'");
 		next;
 	    } else {
 		next;
@@ -353,7 +353,7 @@ sub validate_map {
 	my $unique = _get_boolean($subschema->{unique});
 	if ($unique) {
 	    if (defined $unique_mapping_val->{$key}->{val} && $unique_mapping_val->{$key}->{val} eq $data->{$key}) {
-		$self->_error("`$data->{$key}' is already used at `$unique_mapping_val->{$key}->{path}'");
+		$self->_error("'$data->{$key}' is already used at '$unique_mapping_val->{$key}->{path}'");
 	    } else {
 		$unique_mapping_val->{$key} = { val  => $data->{$key},
 						path => $subpath,
@@ -374,7 +374,7 @@ sub validate_map {
 	    if ($default_key_schema) {
 		$self->_validate($default_key_schema, $val, $subpath);
 	    } else {
-		$self->_error("Unexpected key `$key'");
+		$self->_error("Unexpected key '$key'");
 	    }
 	}
     }

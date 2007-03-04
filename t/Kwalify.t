@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.9 2007/02/27 23:39:26 eserte Exp $
+# $Id: Kwalify.t,v 1.10 2007/03/04 10:33:20 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -84,7 +84,7 @@ EOF
 EOF
 
     is_invalid_yaml($schema01,$document01b, 
-		    [qr{\Q[/1] Non-valid data `123', expected a str}],
+		    [qr{\Q[/1] Non-valid data '123', expected a str}],
 		    "Non valid data, int in sequence of str");
     
     my $schema02 = <<'EOF';
@@ -117,9 +117,9 @@ age:    twenty
 birth:  Jun 01, 1985
 EOF
     is_invalid_yaml($schema02, $document02b,
-		    [qr{\Q[/birth] Non-valid data `Jun 01, 1985', expected a date (YYYY-MM-DD)},
-		     qr{\Q[/age] Non-valid data `twenty', expected an int},
-		     qr{\Q[/email] Non-valid data `foo(at)mail.com' does not match /@/},
+		    [qr{\Q[/birth] Non-valid data 'Jun 01, 1985', expected a date (YYYY-MM-DD)},
+		     qr{\Q[/age] Non-valid data 'twenty', expected an int},
+		     qr{\Q[/email] Non-valid data 'foo(at)mail.com' does not match /@/},
 		    ],
 		    "invalid mapping");
 
@@ -152,9 +152,9 @@ EOF
   mail:   baz@mail.org
 EOF
     is_invalid_yaml($schema03, $document03b,
-		    [qr{\Q[/1] Expected required key `name'},
-		     qr{\Q[/1/naem] Unexpected key `naem'},
-		     qr{\Q[/2/mail] Unexpected key `mail'},
+		    [qr{\Q[/1] Expected required key 'name'},
+		     qr{\Q[/1/naem] Unexpected key 'naem'},
+		     qr{\Q[/2/mail] Unexpected key 'mail'},
 		    ]);
 
     my $schema04 = <<'EOF';
@@ -203,8 +203,8 @@ employees:
     mail:   bar@kuwata-lab.com
 EOF
     is_invalid_yaml($schema04, $document04b,
-		    [qr{\Q[/employees/0/code] Non-valid data `A101', expected an int},
-		     qr{\Q[/employees/1/mail] Unexpected key `mail'},
+		    [qr{\Q[/employees/0/code] Non-valid data 'A101', expected an int},
+		     qr{\Q[/employees/1/mail] Unexpected key 'mail'},
 		    ]);
 
     my $schema05 = <<'EOF';
@@ -269,16 +269,16 @@ EOF
 EOF
     is_invalid_yaml($schema05, $document05b,
 		    [
-		     qr{\Q[/0/blood] `a': invalid blood value},
-		     qr{\Q[/0/email] Non-valid data `foo(at)mail.com' does not match /@/},
-		     qr{\Q[/0/password] `xxx123' is too short (length 6 < min 8)},
-		     qr{\Q[/0/age] Non-valid data `twenty', expected an int},
-		     qr{\Q[/0/age] `twenty' is too small (< min 18)},
-		     qr{\Q[/1/birth] Non-valid data `1980/01/01', expected a date (YYYY-MM-DD)},
-		     qr{\Q[/1] Expected required key `name'},
-		     qr{\Q[/1/age] `15' is too small (< min 18)},
-		     qr{\Q[/1/given-name] Unexpected key `given-name'},
-		     qr{\Q[/1/family-name] Unexpected key `family-name'},
+		     qr{\Q[/0/blood] 'a': invalid blood value},
+		     qr{\Q[/0/email] Non-valid data 'foo(at)mail.com' does not match /@/},
+		     qr{\Q[/0/password] 'xxx123' is too short (length 6 < min 8)},
+		     qr{\Q[/0/age] Non-valid data 'twenty', expected an int},
+		     qr{\Q[/0/age] 'twenty' is too small (< min 18)},
+		     qr{\Q[/1/birth] Non-valid data '1980/01/01', expected a date (YYYY-MM-DD)},
+		     qr{\Q[/1] Expected required key 'name'},
+		     qr{\Q[/1/age] '15' is too small (< min 18)},
+		     qr{\Q[/1/given-name] Unexpected key 'given-name'},
+		     qr{\Q[/1/family-name] Unexpected key 'family-name'},
 		    ]);
 
     my $schema06 = <<'EOF';
@@ -336,8 +336,8 @@ EOF
     - users
 EOF
     is_invalid_yaml($schema06, $document06b,
-		    [qr{\Q[/0/groups/3] `foo' is already used at `/0/groups/0'},
-		     qr{\Q[/2/name] `bar' is already used at `/1/name'},
+		    [qr{\Q[/0/groups/3] 'foo' is already used at '/0/groups/0'},
+		     qr{\Q[/2/name] 'bar' is already used at '/1/name'},
 		    ]);
 
     # Recursive mappings:
@@ -639,15 +639,15 @@ EOF
 
     eval { validate({type=>"text",
 		     unknown_key => "foo"}, "foo") };
-    like($@, qr{Unexpected key `unknown_key' in type specification}, "unknown key in type");
+    like($@, qr{Unexpected key 'unknown_key' in type specification}, "unknown key in type");
 
     eval { validate({type=>"int",
 		     range=>{foo => 1}}, "foo") };
-    like($@, qr{Unexpected key `foo' in range specification}, "unknown key in range");
+    like($@, qr{Unexpected key 'foo' in range specification}, "unknown key in range");
 
     eval { validate({type=>"int",
 		     length=>{foo => 1}}, "foo") };
-    like($@, qr{Unexpected key `foo' in length specification}, "unknown key in length");
+    like($@, qr{Unexpected key 'foo' in length specification}, "unknown key in length");
 }
 
 {
