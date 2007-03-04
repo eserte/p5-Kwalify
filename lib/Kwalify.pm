@@ -1,7 +1,7 @@
-# -*- perl -*-
+# -*- mode: cperl; coding: latin-2 -*-
 
 #
-# $Id: Kwalify.pm,v 1.18 2007/03/04 10:33:20 eserte Exp $
+# $Id: Kwalify.pm,v 1.19 2007/03/04 10:43:56 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006,2007 Slaven Rezic. All rights reserved.
@@ -20,8 +20,8 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.15';
-# sprintf("%d.%02d", q$Revision: 1.18 $ =~ /(\d+)\.(\d+)/);
+$VERSION = '1.16';
+# sprintf("%d.%02d", q$Revision: 1.19 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
