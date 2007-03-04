@@ -1,5 +1,9 @@
 Revision history for Perl extension Kwalify.
 
+1.16
+	- get rid of backquote in error and warning messages (after reading
+	  http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html)
+
 1.15
 	- include experimental META.yml spec (version 1.3) to test directory
 	- new -v version in pkwalify
