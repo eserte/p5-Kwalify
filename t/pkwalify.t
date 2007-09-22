@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.8 2007/01/10 22:51:24 eserte Exp $
+# $Id: pkwalify.t,v 1.9 2007/09/22 10:45:13 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -21,6 +21,9 @@ BEGIN {
 	exit;
     }
 }
+
+require blib; # just to get blib's VERSION
+my $skip_warnings_test = $blib::VERSION < 1.01;
 
 my @yaml_syck_defs = (["schema05.yaml", "document05a.yaml", 1],
 		      ["schema05.yaml", "document05b.yaml", 0],
@@ -181,12 +184,16 @@ sub any_test {
 	if (!$valid) {
 	    diag "STDOUT=$stdout\nSTDERR=$stderr\n" if $v;
 	}
-	if ($valid) {
-	    is($stdout, "", "No warnings in @args");
-	} else {
-	    isnt($stdout, "", "There are warnings in @args");
+    SKIP: {
+	    skip("Older blib versions write to STDERR", 2)
+		if $skip_warnings_test;
+	    if ($valid) {
+		is($stdout, "", "No warnings in @args");
+	    } else {
+		isnt($stdout, "", "There are warnings in @args");
+	    }
+	    is($stderr, "", "Nothing in STDERR");
 	}
-	is($stderr, "", "Nothing in STDERR");
     } else {
     SKIP: { skip("No stdout/stderr tests without IPC::Run", 2) }
     }
