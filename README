@@ -3,7 +3,7 @@ Kwalify
 
 Kwalify is a Perl implementation for validating data structures
 against the Kwalify schema. For a schema definition, see
-http://www.kuwata-lab.com/kwalify/users-guide.01.html
+http://www.kuwata-lab.com/kwalify/ruby/users-guide.01.html
 
 Note that there is no support for validator hooks (section 1-7 of the
 user guide document).

@@ -1,7 +1,7 @@
 # -*- mode: cperl; coding: latin-2 -*-
 
 #
-# $Id: Kwalify.pm,v 1.19 2007/03/04 10:43:56 eserte Exp $
+# $Id: Kwalify.pm,v 1.20 2008/06/18 21:39:50 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006,2007 Slaven Rezic. All rights reserved.
@@ -21,7 +21,7 @@ use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
 $VERSION = '1.16';
-# sprintf("%d.%02d", q$Revision: 1.19 $ =~ /(\d+)\.(\d+)/);
+# sprintf("%d.%02d", q$Revision: 1.20 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
@@ -436,7 +436,7 @@ Typically used together with YAML or JSON:
 
 Kwalify is a Perl implementation for validating data structures
 against the Kwalify schema. For a schema definition, see
-L<http://www.kuwata-lab.com/kwalify/users-guide.01.html>.
+L<http://www.kuwata-lab.com/kwalify/ruby/users-guide.01.html>.
 
 =head2 validate($schema_data, $data)
 
