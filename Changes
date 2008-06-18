@@ -1,5 +1,9 @@
 Revision history for Perl extension Kwalify.
 
+1.17
+	- documentation change: the URL of the schema user guide
+	  changed (thanks to Christoph Lamprecht for the pointer)
+
 1.16
 	- get rid of backquote in error and warning messages (after reading
 	  http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html)
