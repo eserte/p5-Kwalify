@@ -1,5 +1,10 @@
 Revision history for Perl extension Kwalify.
 
+1.18
+	- additional checks were not run with type 'any'
+	- ceasing a warning if undef was used in enum
+	- added warnings::compat prereq for 5.005 and older
+
 1.17
 	- documentation change: the URL of the schema user guide
 	  changed (thanks to Christoph Lamprecht for the pointer)
