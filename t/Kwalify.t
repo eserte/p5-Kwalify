@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.11 2008/07/16 19:38:37 eserte Exp $
+# $Id: Kwalify.t,v 1.12 2008/07/16 19:52:26 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -686,6 +686,10 @@ EOF
     ok(validate($schema, undef), "enum with undefined value");
 }
 
-is("@w", "", "No warnings expected");
+SKIP: {
+    skip("Don't bother with warnings on old perls without warnings.pm", 1)
+	if $] < 5.006;
+    is("@w", "", "No warnings expected");
+}
 
 __END__
