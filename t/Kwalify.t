@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.10 2007/03/04 10:33:20 eserte Exp $
+# $Id: Kwalify.t,v 1.11 2008/07/16 19:38:37 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -26,12 +26,15 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 36;
-    plan tests => 2 + $yaml_syck_tests + 31;
+    plan tests => 2 + $yaml_syck_tests + 36;
 }
 
 BEGIN {
     use_ok('Kwalify', 'validate');
 }
+
+my @w;
+$SIG{__WARN__} = sub { push @w, @_ };
 
 use_ok('Schema::Kwalify');
 
@@ -658,5 +661,31 @@ EOF
     eval { $sk->validate({type=>"text"},[]) };
     isnt($@, "", "Simple Schema::Kwalify failure");
 }
+
+{
+    # Test any with additional checks
+    my $schema =
+	{
+	 type => "any",
+	 pattern => "CODE",
+	};
+    ok(validate($schema, "CODE"), "type any with additional check, successful");
+    eval {
+	validate($schema, "CoDe");
+    };
+    like($@, qr{Non-valid data 'CoDe' does not match /CODE/}, "type any with additional check, failure");
+}
+
+{
+    my $schema =
+	{
+	 type => "any",
+	 enum => [1,2,undef],
+	};
+    ok(validate($schema, 1), "enum with defined value");
+    ok(validate($schema, undef), "enum with undefined value");
+}
+
+is("@w", "", "No warnings expected");
 
 __END__
