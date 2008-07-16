@@ -1,7 +1,7 @@
 # -*- mode: cperl; coding: latin-2 -*-
 
 #
-# $Id: Kwalify.pm,v 1.21 2008/06/18 21:40:38 eserte Exp $
+# $Id: Kwalify.pm,v 1.22 2008/07/16 19:32:40 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006,2007,2008 Slaven Rezic. All rights reserved.
@@ -20,8 +20,8 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.17';
-# sprintf("%d.%02d", q$Revision: 1.21 $ =~ /(\d+)\.(\d+)/);
+$VERSION = '1.18';
+# sprintf("%d.%02d", q$Revision: 1.22 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
@@ -120,6 +120,7 @@ sub _additional_rules {
 		if (!UNIVERSAL::isa($schema->{enum}, 'ARRAY')) {
 		    $self->_die("'enum' must be an array");
 		}
+		no warnings 'uninitialized'; # undef amongst the enum values may be intended!
 		my %valid = map { ($_,1) } @{ $schema->{enum} };
 		if (!exists $valid{$data}) {
 		    $self->_error("'$data': invalid " . _base_path($path) . " value");
@@ -256,7 +257,8 @@ sub validate_timestamp {
 }
 
 sub validate_any {
-    1;
+    my($self, $schema, $data, $path) = @_;
+    $self->_additional_rules($schema, $data, $path);
 }
 
 sub validate_seq {
