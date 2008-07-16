@@ -6,7 +6,9 @@ $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i &
 WriteMakefile(
     NAME              => 'Kwalify',
     VERSION_FROM      => 'lib/Kwalify.pm',
-    PREREQ_PM         => {},
+    PREREQ_PM         => {
+	($] < 5.006 ? ('warnings::compat' => 0) : ()),
+    },
     EXE_FILES         => ['pkwalify'],
     LICENSE	      => 'perl',
     #NO_META           => 1,
