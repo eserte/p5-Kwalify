@@ -59,27 +59,25 @@ mapping:
         required: yes
   recommends: *requires
   optional_features:
-    type: seq
-    sequence:
-      - type: map
+    type: map
+    mapping:
+      =:
+        type: map
         mapping:
-          =:
-            type: map
-            mapping:
-              description:
-                type: text
-              requires: *requires
-              build_requires: *requires
-              conflichts: *requires
-              requires_packages:
-                comment: exact specification missing
-                type: any
-              requires_os:
-                comment: exact specification missing
-                type: any
-              excludes_os:
-                comment: exact specification missing
-                type: any
+          description:
+            type: text
+          requires: *requires
+          build_requires: *requires
+          conflichts: *requires
+          requires_packages:
+            comment: exact specification missing
+            type: any
+          requires_os:
+            comment: exact specification missing
+            type: any
+          excludes_os:
+            comment: exact specification missing
+            type: any
   build_requires: *requires
   conflicts: *requires
   dynamic_config:
