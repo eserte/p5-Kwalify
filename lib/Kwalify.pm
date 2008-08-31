@@ -1,7 +1,7 @@
 # -*- mode: cperl; coding: latin-2 -*-
 
 #
-# $Id: Kwalify.pm,v 1.22 2008/07/16 19:32:40 eserte Exp $
+# $Id: Kwalify.pm,v 1.23 2008/08/31 16:14:13 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 2006,2007,2008 Slaven Rezic. All rights reserved.
@@ -20,8 +20,8 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.18';
-# sprintf("%d.%02d", q$Revision: 1.22 $ =~ /(\d+)\.(\d+)/);
+$VERSION = '1.19';
+# sprintf("%d.%02d", q$Revision: 1.23 $ =~ /(\d+)\.(\d+)/);
 
 BEGIN {
     if ($] < 5.006) {
@@ -175,7 +175,7 @@ sub _additional_rules {
 		}
 	    } elsif ($schema_key eq 'assert') {
 		$self->_die("'assert' is not yet implemented");
-	    } elsif ($schema_key !~ m{^(type|required|unique|name|classname|desc)$}) {
+	    } elsif ($schema_key !~ m{^(type|required|unique|name|classname|class|desc)$}) {
 		$self->_die("Unexpected key '$schema_key' in type specification");
 	    }
 	}
@@ -438,7 +438,8 @@ Typically used together with YAML or JSON:
 
 Kwalify is a Perl implementation for validating data structures
 against the Kwalify schema. For a schema definition, see
-L<http://www.kuwata-lab.com/kwalify/ruby/users-guide.01.html>.
+L<http://www.kuwata-lab.com/kwalify/ruby/users-guide.01.html>, but see
+also below L</SCHEMA DEFINITION>.
 
 =head2 validate($schema_data, $data)
 
@@ -446,6 +447,100 @@ Validate I<$data> according to Kwalify schema specified in
 I<$schema_data>. Dies if the validation fails.
 
 B<validate> may be exported.
+
+=head1 SCHEMA DEFINITION
+
+The original schema definition document is not very specific about
+types and behaviour. Here's how B<Kwalify.pm> implements things:
+
+=over
+
+=item pattern
+
+Perl regular expressions are used for patterns. This may or may not be
+compatible with other Kwalify validators, so restrict to "simple"
+regular expression constructs to be compatible with other validators.
+
+=item type
+
+=over
+
+=item str
+
+Any defined value which is B<not> a number. Most probably you will
+want to use B<text> instead of B<str>.
+
+=item int
+
+A possibly signed integer. Note that scientific notation is not
+supported, and it is also not clear whether it should be supported.
+
+=item float
+
+A possibly signed floating value with a mandatory decimal point. Note
+that scientific notation is also not supported here.
+
+=item bool
+
+The values B<yes>, B<true>, and B<1> for true values and the values
+B<no>, B<false>, and B<0> for false values are allowed. The ruby
+implementation possibly allows more values, but this is not
+documented.
+
+Note that this definition is problematic, because for example the
+string B<no> is a true boolean value in Perl. So one should stick to
+B<0> and B<1> as data values, and probably define an additional
+B<pattern> or B<enum> to ensure this:
+
+    type: bool
+    enum: [0, 1]
+
+=item scalar
+
+Currently the same as B<text>, but it's not clear if this is correct.
+
+=item date
+
+A string matching C<< /^\d{4}-\d{2}-\d{2}$/ >> (i.e. YYYY-MM-DD). Note
+that no date range checks are done (yet).
+
+=item time
+
+A string matching C<< /^\d{2}:\d{2}:\d{2}$/ >> (i.e. HH:MM:SS). Note
+that no time range checks are done (yet).
+
+=item timestamp
+
+Not supported --- it is not clear what this is supposed to be.
+
+=back
+
+=item assert
+
+Currently not supported by the Perl implementation.
+
+=item classname
+
+Previously defined what is now B<class>, see L<http://web.archive.org/web/20071230173101/http://www.kuwata-lab.com/kwalify/users-guide.01.html>.
+
+=item class
+
+Currently not used, as there's no genclass action.
+
+=item default
+
+Currently not used, as there's no genclass action.
+
+=back
+
+=head1 TECHNICAL NOTES
+
+As B<Kwalify.pm> is a pure validator and de-coupled from a parser (in
+fact, it does not need to deal with YAML at all, but just with pure
+perl data structures), there's no connection to the original validated
+document. This means that no line numbers are available to the
+validator. In case of validation errors the validator is only able to
+show a path-like expression to the data causing the error.
 
 =head1 AUTHOR
 
@@ -462,5 +557,7 @@ at your option, any later version of Perl 5 you may have available.
 =head1 SEE ALSO
 
 L<pkwalify>, L<kwalify(1)>.
+
+Other non-XML schema languages: L<http://rjbs.manxome.org/rx/>
 
 =cut
