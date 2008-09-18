@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.9 2007/09/22 10:45:13 eserte Exp $
+# $Id: pkwalify.t,v 1.10 2008/09/18 19:10:38 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -40,6 +40,9 @@ my %combined_document;
 
 	my($fh,$outfile) = File::Temp::tempfile(SUFFIX => ".yaml",
 						UNLINK => 1);
+	if (!$fh) {
+	    die "Cannot create temporary file: $!";
+	}
 
 	for my $document (@yaml) {
 	    print $fh "--- \n";
