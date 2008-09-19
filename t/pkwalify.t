@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.10 2008/09/18 19:10:38 eserte Exp $
+# $Id: pkwalify.t,v 1.11 2008/09/19 18:40:53 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -210,7 +210,7 @@ sub _run_pkwalify {
     if (eval { require IPC::Run; 1 }) {
 	$can_capture = 1;
 	$success = IPC::Run::run(\@cmd, \$stdin, \$stdout, \$stderr) ? 1 : 0;
-    } elsif (eval { require IPC::Open3; 1 }) {
+    } else {
 	*OLDOUT = *OLDOUT; # cease -w
 	*OLDERR = *OLDERR; # cease -w
 	open(OLDOUT, ">&STDOUT") or die $!;
@@ -224,10 +224,6 @@ sub _run_pkwalify {
 	open(STDOUT, ">&OLDOUT") or die $!;
 
 	$success = $? == 0 ? 1 : 0;
-    } else {
-	# Should not happen, every perl5 installation should have
-	# IPC::Open3
-	warn "Cannot test, no IPC::Run and/or IPC::Open3 available";
     }
 
     return { success => $success,
