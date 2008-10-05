@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.11 2008/09/19 18:40:53 eserte Exp $
+# $Id: pkwalify.t,v 1.12 2008/10/05 18:16:24 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -14,7 +14,7 @@ BEGIN {
     if (!eval q{
 	use Test::More;
 	use File::Temp;
-	use File::Spec;
+	use File::Spec 0.8; # rel2abs
 	1;
     }) {
 	print "1..0 # skip: no Test::More, File::Spec and/or File::Temp modules\n";
@@ -43,6 +43,10 @@ my %combined_document;
 	if (!$fh) {
 	    die "Cannot create temporary file: $!";
 	}
+
+	# fix possible problem if somebody sets TMPDIR=.
+	$outfile = File::Spec->rel2abs($outfile)
+	    if !File::Spec->file_name_is_absolute($outfile);
 
 	for my $document (@yaml) {
 	    print $fh "--- \n";
