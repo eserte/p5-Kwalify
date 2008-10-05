@@ -1,5 +1,8 @@
 Revision history for Perl extension Kwalify.
 
+1.20
+	- test failure fix
+
 1.19
 	- allow the new "class" (previously "classname")
 	- more documentation about unclear schema definition
