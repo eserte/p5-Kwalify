@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.12 2008/07/16 19:52:26 eserte Exp $
+# $Id: Kwalify.t,v 1.13 2008/10/05 18:17:35 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -26,7 +26,7 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 36;
-    plan tests => 2 + $yaml_syck_tests + 36;
+    plan tests => 2 + $yaml_syck_tests + 37;
 }
 
 BEGIN {
@@ -592,9 +592,17 @@ EOF
 {
     ok(validate({type=>"text",
 		 name=>"A schema name",
-		 classname=>"TestClass",
+		 classname=>"TestClass", # the old now undocumented "classname"
 		 desc=>"Just testing the description.\nReally!",
 		}, "foo"), "Passing name/classname/desc");
+}
+
+{
+    ok(validate({type=>"text",
+		 name=>"A schema name",
+		 class=>"TestClass", # the new "class" (instead of "classname")
+		 desc=>"Just testing the description.\nReally!",
+		}, "foo"), "Passing name/class/desc");
 }
 
 {
