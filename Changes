@@ -1,5 +1,10 @@
 Revision history for Perl extension Kwalify.
 
+1.19
+	- allow the new "class" (previously "classname")
+	- more documentation about unclear schema definition
+	- -h/-help is not anymore "accidentaly" showing the usage
+
 1.18
 	- additional checks were not run with type 'any'
 	- ceasing a warning if undef was used in enum
