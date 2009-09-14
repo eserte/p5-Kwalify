@@ -25,7 +25,7 @@ BEGIN {
 
 my $yaml_syck_tests;
 BEGIN {
-    $yaml_syck_tests = 36;
+    $yaml_syck_tests = 38;
     plan tests => 2 + $yaml_syck_tests + 38;
 }
 
@@ -341,6 +341,17 @@ EOF
     is_invalid_yaml($schema06, $document06b,
 		    [qr{\Q[/0/groups/3] 'foo' is already used at '/0/groups/0'},
 		     qr{\Q[/2/name] 'bar' is already used at '/1/name'},
+		    ]);
+
+    # testcase for RT #48800
+    my $document_unique = <<'EOF';
+- name:   foo
+- name:   bar
+- name:   barf
+- name:   bar
+EOF
+    is_invalid_yaml($schema06, $document_unique,
+		    [qr{\Q[/3/name] 'bar' is already used at '/1/name'},
 		    ]);
 
     # Recursive mappings:
