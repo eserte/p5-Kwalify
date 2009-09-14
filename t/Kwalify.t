@@ -2,7 +2,6 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.14 2009/09/14 19:24:02 eserte Exp $
 # Author: Slaven Rezic
 #
 

@@ -2,7 +2,6 @@
 # -*- perl -*-
 
 #
-# $Id: compat.t,v 1.2 2006/12/02 10:46:44 eserte Exp $
 # Author: Slaven Rezic
 #
 

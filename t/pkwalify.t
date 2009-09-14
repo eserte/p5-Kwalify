@@ -2,7 +2,6 @@
 # -*- perl -*-
 
 #
-# $Id: pkwalify.t,v 1.12 2008/10/05 18:16:24 eserte Exp $
 # Author: Slaven Rezic
 #
 
