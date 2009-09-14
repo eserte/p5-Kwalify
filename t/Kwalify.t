@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: Kwalify.t,v 1.13 2008/10/05 18:17:35 eserte Exp $
+# $Id: Kwalify.t,v 1.14 2009/09/14 19:24:02 eserte Exp $
 # Author: Slaven Rezic
 #
 
@@ -26,7 +26,7 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 36;
-    plan tests => 2 + $yaml_syck_tests + 37;
+    plan tests => 2 + $yaml_syck_tests + 38;
 }
 
 BEGIN {
@@ -659,6 +659,12 @@ EOF
     eval { validate({type=>"int",
 		     length=>{foo => 1}}, "foo") };
     like($@, qr{Unexpected key 'foo' in length specification}, "unknown key in length");
+
+    eval { validate({type=>"map",
+		     mapping=>
+		     {foo=>{type=>"text"}}
+		    }, []) };
+    like($@, qr{Non-valid data .*, expected mapping}, "expected hash in data");
 }
 
 {
