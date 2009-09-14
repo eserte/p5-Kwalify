@@ -68,7 +68,7 @@ mapping:
             type: text
           requires: *requires
           build_requires: *requires
-          conflichts: *requires
+          conflicts: *requires
           requires_packages:
             comment: exact specification missing
             type: any
