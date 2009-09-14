@@ -355,12 +355,13 @@ sub validate_map {
 	}
 	my $unique = _get_boolean($subschema->{unique});
 	if ($unique) {
-	    if (defined $unique_mapping_val->{$key}->{val} && $unique_mapping_val->{$key}->{val} eq $data->{$key}) {
-		$self->_error("'$data->{$key}' is already used at '$unique_mapping_val->{$key}->{path}'");
+	    if (defined $unique_mapping_val->{$data->{$key}}->{val} 
+		&& $unique_mapping_val->{$data->{$key}}->{val} eq $data->{$key}) {
+		$self->_error("'$data->{$key}' is already used at '$unique_mapping_val->{$data->{$key}}->{path}'");
 	    } else {
-		$unique_mapping_val->{$key} = { val  => $data->{$key},
-						path => $subpath,
-					      };
+		$unique_mapping_val->{$data->{$key}} = { val  => $data->{$key},
+							 path => $subpath,
+						       };
 	    }
 	}
 
