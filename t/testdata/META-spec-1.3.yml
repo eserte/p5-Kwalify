@@ -117,7 +117,7 @@ mapping:
     mapping:
       license: &optional_url
         type: text
-        pattern: /^((ftp|https?):\/\/|mailto:.*@)/
+        pattern: /^((ftp|https?|git):\/\/|mailto:.*@)/
         required: no
       homepage: *optional_url
       bugtracker: *optional_url
