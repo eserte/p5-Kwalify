@@ -2,6 +2,7 @@ Revision history for Perl extension Kwalify.
 
 1.20
 	- test failure fix
+	- fixed RT #48714 (return early if not a hash was given)
 
 1.19
 	- allow the new "class" (previously "classname")
