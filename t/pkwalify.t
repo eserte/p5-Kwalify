@@ -24,10 +24,12 @@ BEGIN {
 require blib; # just to get blib's VERSION
 my $skip_warnings_test = $blib::VERSION < 1.01;
 
+# Test cases with single documents
 my @yaml_syck_defs = (["schema05.yaml", "document05a.yaml", 1],
 		      ["schema05.yaml", "document05b.yaml", 0],
 		     );
 
+# Test cases with multiple documents (by combining single documents)
 my %combined_document;
 {
     for my $def (["invalid_diff",   "document05a.yaml", "document05b.yaml"],
@@ -63,6 +65,7 @@ my %combined_document;
     }
 }
 
+# Test cases for YAML::Syck (schema+document combinations)
 push @yaml_syck_defs, (
 		       [$combined_document{"invalid_schema"}, "document05a.yaml", 0],
 		       ["schema05.yaml", $combined_document{"invalid_diff"}, 0],
@@ -70,7 +73,27 @@ push @yaml_syck_defs, (
 		       ["schema05.yaml", $combined_document{"invalid_same"}, 0],
 		      );
 
+# Test cases for JSON (generated from YAML documents)
 my @json_defs = ();
+if (eval { require YAML::Syck; require JSON; 1 }) {
+    my %json_equivalent;
+    for my $file ('schema05.yaml',  'document05a.yaml', 'document05b.yaml') {
+	my($tmpfh,$tmpfile) = File::Temp::tempfile(SUFFIX => '.json',
+						   UNLINK => 1);
+	my $data = YAML::Syck::LoadFile("$FindBin::RealBin/testdata/$file");
+	if (defined &JSON::to_json) {
+	    print $tmpfh JSON::to_json($data, {utf8 => 1});
+	} else {
+	    print $tmpfh JSON::objToJson($data);
+	}
+	close $tmpfh
+	    or die "Can't write JSON data to $tmpfile: $!";
+	$json_equivalent{$file} = $tmpfile;
+    }
+    push @json_defs, ([$json_equivalent{'schema05.yaml'}, $json_equivalent{'document05a.yaml'}, 1],
+		      [$json_equivalent{'schema05.yaml'}, $json_equivalent{'document05b.yaml'}, 0],
+		     );
+}
 
 my $v;
 GetOptions("v!")
