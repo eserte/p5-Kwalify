@@ -19,7 +19,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.20_51';
+$VERSION = '1.21';
 
 BEGIN {
     if ($] < 5.006) {

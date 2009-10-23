@@ -1,6 +1,6 @@
 Revision history for Perl extension Kwalify.
 
-1.20_50
+1.21
 	- fixed RT #48800 (unique in mappings did not work correctly)
 
 1.20
