@@ -256,7 +256,28 @@ sub validate_timestamp {
 
 sub validate_any {
     my($self, $schema, $data, $path) = @_;
-    $self->_additional_rules($schema, $data, $path);
+    if ($schema->{of}) {
+	if (!UNIVERSAL::isa($schema->{of}, 'ARRAY')) {
+	    $self->_die("any of expects a sequence");
+	}
+	if (@{ $schema->{of} } == 0) {
+	    $self->_die("any of sequence cannot be empty");
+	}
+	# Somewhat hacky: we need to localize the error string
+	my @local_errors;
+	{
+	    for my $subschema (@{ $schema->{of} }) {
+		local $self->{errors} = [];
+		$self->_validate($subschema, $data, $path);
+		return if !@{ $self->{errors} };
+		push @local_errors, @{ $self->{errors} };
+	    }
+	}
+	$self->_error("No any of subschema matched. Gathered errors:\n" . join("\n", @local_errors));
+	return;
+    } else {
+	$self->_additional_rules($schema, $data, $path);
+    }
 }
 
 sub validate_seq {
