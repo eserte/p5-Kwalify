@@ -90,3 +90,8 @@ mapping:   &main-rule
         mapping:   *main-rule
         name:      MAIN
         #required:  yes
+ "of":
+    type:      seq
+    sequence:
+      - type:      map
+        mapping:   *main-rule
