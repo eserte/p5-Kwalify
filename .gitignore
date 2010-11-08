@@ -1,5 +1,7 @@
+/.prove
+/Kwalify-*.tar.gz
 /Makefile
 /Makefile.old
 /blib
+/cover_db
 /pm_to_blib
-/Kwalify-*.tar.gz
