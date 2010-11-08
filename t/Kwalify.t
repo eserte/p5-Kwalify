@@ -25,7 +25,7 @@ BEGIN {
 my $yaml_syck_tests;
 BEGIN {
     $yaml_syck_tests = 38;
-    plan tests => 2 + $yaml_syck_tests + 38;
+    plan tests => 2 + $yaml_syck_tests + 40;
 }
 
 BEGIN {
@@ -708,6 +708,16 @@ EOF
 	};
     ok(validate($schema, 1), "enum with defined value");
     ok(validate($schema, undef), "enum with undefined value");
+}
+
+{
+    my $schema =
+	{
+	 type => "any",
+	 pattern => '/^(|something)$/',
+	};
+    ok(validate($schema, 'something'), "legally undefined pattern");
+    ok(validate($schema, undef), "legally undefined pattern");
 }
 
 SKIP: {

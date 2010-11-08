@@ -77,6 +77,7 @@ sub _validate {
 
 sub _additional_rules {
     my($self, $schema, $data, $path) = @_;
+    no warnings 'uninitialized'; # legal undef values may happen everywhere
     for my $schema_key (keys %$schema) {
 	if (defined $schema->{$schema_key}) {
 	    if ($schema_key eq 'pattern') {
@@ -118,7 +119,6 @@ sub _additional_rules {
 		if (!UNIVERSAL::isa($schema->{enum}, 'ARRAY')) {
 		    $self->_die("'enum' must be an array");
 		}
-		no warnings 'uninitialized'; # undef amongst the enum values may be intended!
 		my %valid = map { ($_,1) } @{ $schema->{enum} };
 		if (!exists $valid{$data}) {
 		    $self->_error("'$data': invalid " . _base_path($path) . " value");
