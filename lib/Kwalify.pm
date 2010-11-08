@@ -1,9 +1,9 @@
-# -*- mode: cperl; coding: latin-2 -*-
+# -*- mode: cperl -*-
 
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006,2007,2008,2009 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007,2008,2009,2010 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -19,7 +19,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 BEGIN {
     if ($] < 5.006) {
@@ -415,8 +415,6 @@ sub _get_boolean {
 1;
 __END__
 
-=encoding iso-8859-2
-
 =head1 NAME
 
 Kwalify - Kwalify schema for data structures
@@ -544,11 +542,11 @@ show a path-like expression to the data causing the error.
 
 =head1 AUTHOR
 
-Slaven Reziæ, E<lt>srezic@cpan.orgE<gt>
+Slaven ReziE<x0107>, E<lt>srezic@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006,2007,2008,2009 by Slaven Reziæ
+Copyright (C) 2006,2007,2008,2009,2010 by Slaven ReziE<x0107>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
