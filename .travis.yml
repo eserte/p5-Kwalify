@@ -6,3 +6,7 @@ perl:
   - "5.12"
   - "5.10"
   - "5.8"
+before_install:
+  cpanm -n Devel::Cover::Report::Coveralls
+script:
+  perl Makefile.PL && make && cover -test -report coveralls
