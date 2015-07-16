@@ -10,9 +10,9 @@ perl:
 matrix:
   include:
     - perl: "5.18"
-      env: WITH_JSON_XS=1
+      env: WITH_JSON_XS=1 WITH_YAML_SYCK=1
     - perl: "5.18"
-      env: WITH_JSON=1
+      env: WITH_JSON=1 WITH_YAML=1
     - perl: "5.18"
       env: WITH_YAML_SYCK=1
     - perl: "5.18"
