@@ -26,7 +26,7 @@ before_install:
   - '[ "$WITH_YAML_SYCK" =  1 ] && cpanm --quiet --notest YAML::Syck                         || true'
   - '[ "$WITH_YAML"      =  1 ] && cpanm --quiet --notest YAML                               || true'
   - '[ "$WITH_IPC_RUN"   =  1 ] && cpanm --quiet --notest IPC::Run                           || true'
-post_script:
+after_script:
   - '[ "$DO_COVERALLS"   =  1 ] && cover -test -report coveralls || true'
 
 sudo: false
