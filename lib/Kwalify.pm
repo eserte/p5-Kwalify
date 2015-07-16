@@ -431,7 +431,7 @@ Typically used together with YAML or JSON:
   validate(YAML::LoadFile($schema_file), YAML::LoadFile($data_file));
 
   use JSON;
-  validate(jsonToObj($schema_data), jsonToObj($data));
+  validate(decode_json($schema_data), decode_json($data));
 
 =head1 DESCRIPTION
 
@@ -547,16 +547,15 @@ Slaven ReziE<x0107>, E<lt>srezic@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006,2007,2008,2009,2010 by Slaven ReziE<x0107>
+Copyright (C) 2006,2007,2008,2009,2010,2015 by Slaven ReziE<x0107>
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
 L<pkwalify>, L<kwalify(1)>.
 
-Other non-XML schema languages: L<http://rjbs.manxome.org/rx/>
+Other non-XML schema languages: L<http://rx.codesimply.com/>
 
 =cut
