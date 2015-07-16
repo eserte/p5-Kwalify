@@ -7,8 +7,26 @@ perl:
   - "5.12"
   - "5.10"
   - "5.8"
+matrix:
+  include:
+    - perl: "5.18"
+      env: WITH_JSON_XS=1
+    - perl: "5.18"
+      env: WITH_JSON=1
+    - perl: "5.18"
+      env: WITH_YAML_SYCK=1
+    - perl: "5.18"
+      env: WITH_YAML=1
+    - perl: "5.18"
+      env: WITH_JSON=1 WITH_YAML=1 WITH_IPC_RUN=1 DO_COVERALLS=1
 before_install:
-  cpanm -n Devel::Cover::Report::Coveralls
+  - '[ "$DO_COVERALLS"   =  1 ] && cpanm --quiet --notest Devel::Cover::Report::Coveralls    || true'
+  - '[ "$WITH_JSON_XS"   =  1 ] && cpanm --quiet --notest JSON::XS                           || true'
+  - '[ "$WITH_JSON"      =  1 ] && cpanm --quiet --notest JSON                               || true'
+  - '[ "$WITH_YAML_SYCK" =  1 ] && cpanm --quiet --notest YAML::Syck                         || true'
+  - '[ "$WITH_YAML"      =  1 ] && cpanm --quiet --notest YAML                               || true'
+  - '[ "$WITH_IPC_RUN"   =  1 ] && cpanm --quiet --notest IPC::Run                           || true'
 script:
-  perl Makefile.PL && make && cover -test -report coveralls
+  - '[ "$DO_COVERALLS"   =  1 ] && perl Makefile.PL && make && cover -test -report coveralls || true'
+  - '[ "$DO_COVERALLS"  !=  1 ] && perl Makefile.PL && make all test                         || true'
 sudo: false
