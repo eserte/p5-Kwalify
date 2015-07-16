@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006,2007,2008,2009,2010 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007,2008,2009,2010,2015 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -19,7 +19,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.22';
+$VERSION = '1.22_90';
 
 BEGIN {
     if ($] < 5.006) {
@@ -342,12 +342,13 @@ sub validate_map {
 	    $self->_die("Expected subschema (a hash)");
 	}
 	my $required = _get_boolean($subschema->{required});
-	if (!exists $data->{$key}) {
+	if (!defined $data->{$key}) {
 	    if ($required) {
 		$self->{path} = $path;
 		$self->_error("Expected required key '$key'");
 		next;
 	    } else {
+		$seen_key{$key}++;
 		next;
 	    }
 	}

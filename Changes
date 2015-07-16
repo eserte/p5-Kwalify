@@ -1,5 +1,14 @@
 Revision history for Perl extension Kwalify.
 
+1.22_90
+	- change handling of required:no for existing undefined data.
+	  Now the behavior is like in the ruby implementation:
+	  hash entries with an undefined value are treated as
+	  missing, and thus pass the "required:no" rule.
+	  This addresses https://github.com/eserte/p5-Kwalify/issues/1
+	- more tests
+	- enable travis-ci and coveralls
+
 1.22
 	- cease possible "unitinialized value" warnings
 
