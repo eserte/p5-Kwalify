@@ -37,7 +37,7 @@ __END__
 
 =head1 NAME
 
-Schema::Kwalify - 
+Schema::Kwalify - Kwalify implementation in the Schema:: namespace
 
 =head1 SYNOPSIS
 
