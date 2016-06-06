@@ -14,6 +14,7 @@
 package Kwalify;
 
 use strict;
+use warnings;
 
 use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
