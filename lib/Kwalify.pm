@@ -22,14 +22,6 @@ use vars qw(@EXPORT_OK $VERSION);
 
 $VERSION = '1.22_90';
 
-BEGIN {
-    if ($] < 5.006) {
-	$INC{"warnings.pm"} = 1;
-	*warnings::import = sub { };
-	*warnings::unimport = sub { };
-    }
-}
-
 sub validate ($$) {
     my($schema, $data) = @_;
     my $self = Kwalify::Validator->new;
