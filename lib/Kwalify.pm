@@ -14,20 +14,13 @@
 package Kwalify;
 
 use strict;
+use warnings;
 
 use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
 $VERSION = '1.22_90';
-
-BEGIN {
-    if ($] < 5.006) {
-	$INC{"warnings.pm"} = 1;
-	*warnings::import = sub { };
-	*warnings::unimport = sub { };
-    }
-}
 
 sub validate ($$) {
     my($schema, $data) = @_;
