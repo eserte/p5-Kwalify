@@ -18,6 +18,8 @@ BEGIN {
 	print "1..0 # skip: test works only with perl 5.005 or better\n";
 	exit;
     }
+
+    use_ok('Kwalify', 'validate');
 }
 
 SKIP: {
