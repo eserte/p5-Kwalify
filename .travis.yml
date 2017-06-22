@@ -13,9 +13,13 @@ matrix:
     - perl: "5.18"
       env: WITH_JSON_XS=1 WITH_YAML_SYCK=1
     - perl: "5.18"
+      env: WITH_JSON_XS=1 WITH_YAML_XS=1
+    - perl: "5.18"
       env: WITH_JSON=1 WITH_YAML=1
     - perl: "5.18"
       env: WITH_YAML_SYCK=1
+    - perl: "5.18"
+      env: WITH_YAML_XS=1
     - perl: "5.18"
       env: WITH_YAML=1
     - perl: "5.18"
@@ -26,6 +30,7 @@ before_install:
   - '[ "$WITH_JSON_XS"   =  1 ] && cpanm --quiet --notest JSON::XS                           || true'
   - '[ "$WITH_JSON"      =  1 ] && cpanm --quiet --notest JSON                               || true'
   - '[ "$WITH_YAML_SYCK" =  1 ] && cpanm --quiet --notest YAML::Syck                         || true'
+  - '[ "$WITH_YAML_XS"   =  1 ] && cpanm --quiet --notest YAML::XS                           || true'
   - '[ "$WITH_YAML"      =  1 ] && cpanm --quiet --notest YAML                               || true'
   - '[ "$WITH_IPC_RUN"   =  1 ] && cpanm --quiet --notest IPC::Run                           || true'
 after_script:

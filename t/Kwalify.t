@@ -22,10 +22,10 @@ BEGIN {
     }
 }
 
-my $yaml_syck_tests;
+my $yaml_mod_tests;
 BEGIN {
-    $yaml_syck_tests = 38;
-    plan tests => 2 + $yaml_syck_tests + 60;
+    $yaml_mod_tests = 38;
+    plan tests => 2 + $yaml_mod_tests + 60;
 }
 
 BEGIN {
@@ -37,16 +37,21 @@ $SIG{__WARN__} = sub { push @w, @_ };
 
 use_ok('Schema::Kwalify');
 
+my $can_yaml = (eval { require YAML::Syck; 1 } || eval { require YAML::XS; 1 });
+if ($can_yaml) {
+    *YAML_Load = defined &YAML::Syck::Load ? \&YAML::Syck::Load : \&YAML::XS::Load;
+}
+
 sub is_valid_yaml {
     my($schema, $document, $testname) = @_;
     local $Test::Builder::Level = $Test::Builder::Level+1;
-    ok(validate(YAML::Syck::Load($schema), YAML::Syck::Load($document)), $testname);
+    ok(validate(YAML_Load($schema), YAML_Load($document)), $testname);
 }
 
 sub is_invalid_yaml {
     my($schema, $document, $errors, $testname) = @_;
     local $Test::Builder::Level = $Test::Builder::Level+1;
-    ok(!eval { validate(YAML::Syck::Load($schema), YAML::Syck::Load($document)) }, $testname);
+    ok(!eval { validate(YAML_Load($schema), YAML_Load($document)) }, $testname);
     for my $error (@$errors) {
 	if (UNIVERSAL::isa($error, 'HASH')) {
 	    my($pattern, $testname) = @{$error}{qw(pattern testname)};
@@ -58,8 +63,8 @@ sub is_invalid_yaml {
 }
 
 SKIP: {
-    skip("Need YAML::Syck for tests", $yaml_syck_tests)
-	if !eval { require YAML::Syck; 1 };
+    skip("Need YAML::Syck, YAML or YAML::XS for tests", $yaml_mod_tests)
+	if !$can_yaml;
 
     my $schema01 = <<'EOF';
 type:   seq

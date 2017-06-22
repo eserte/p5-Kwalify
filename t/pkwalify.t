@@ -25,9 +25,10 @@ require blib; # just to get blib's VERSION
 my $skip_warnings_test = $blib::VERSION < 1.01;
 
 # Test cases with single documents
-my @yaml_syck_defs = (["schema05.yaml", "document05a.yaml", 1],
+my @yaml_mod_defs = (
+		      ["schema05.yaml", "document05a.yaml", 1],
 		      ["schema05.yaml", "document05b.yaml", 0],
-		     );
+		    );
 
 # Test cases with multiple documents (by combining single documents)
 my %combined_document;
@@ -65,17 +66,17 @@ my %combined_document;
     }
 }
 
-# Test cases for YAML/YAML::Syck (schema+document combinations)
-push @yaml_syck_defs, (
+# Test cases for YAML/YAML::XS/YAML::Syck (schema+document combinations)
+push @yaml_mod_defs, (
 		       [$combined_document{"invalid_schema"}, "document05a.yaml", 0],
 		       ["schema05.yaml", $combined_document{"invalid_diff"}, 0],
 		       ["schema05.yaml", $combined_document{"valid_same"}, 1],
 		       ["schema05.yaml", $combined_document{"invalid_same"}, 0],
 		      );
 
-my $can_yaml = (eval { require YAML::Syck; 1 } || eval { require YAML; 1 });
+my $can_yaml = (eval { require YAML::Syck; 1 } || eval { require YAML::XS; 1 } || eval { require YAML; 1 });
 if ($can_yaml) {
-    *YAML_LoadFile = defined &YAML::Syck::LoadFile ? \&YAML::Syck::LoadFile : \&YAML::LoadFile;
+    *YAML_LoadFile = defined &YAML::Syck::LoadFile ? \&YAML::Syck::LoadFile : defined &YAML::XS::LoadFile ? \&YAML::XS::LoadFile : \&YAML::LoadFile;
 }
 my $can_json = (eval { require JSON::XS; 1 }   || eval { require JSON; 1 });
 if ($can_json) {
@@ -105,16 +106,16 @@ GetOptions("v!")
     or die "usage: $0 [-v]";
 
 my $tests_per_case = 3;
-plan tests => 13 + $tests_per_case*(scalar(@yaml_syck_defs) + scalar(@json_defs));
+plan tests => 13 + $tests_per_case*(scalar(@yaml_mod_defs) + scalar(@json_defs));
 
 my $script = "$FindBin::RealBin/../blib/script/pkwalify";
 my @cmd = ($^X, "-Mblib=$FindBin::RealBin/..", $script, "-s");
 
 SKIP: {
-    skip("Need YAML or YAML::Syck for tests", $tests_per_case*scalar(@yaml_syck_defs))
+    skip("Need YAML, YAML::XS or YAML::Syck for tests", $tests_per_case*scalar(@yaml_mod_defs))
 	if !$can_yaml;
 
-    for my $def (@yaml_syck_defs) {
+    for my $def (@yaml_mod_defs) {
 	any_test($def);
     }
 }
@@ -165,7 +166,7 @@ SKIP: {
 }
 
 SKIP: {
-    skip("Need YAML or YAML::Syck for tests", 4)
+    skip("Need YAML, YAML::XS or YAML::Syck for tests", 4)
 	if !$can_yaml;
 
     my $schema_file = "schema05.yaml";

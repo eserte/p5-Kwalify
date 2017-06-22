@@ -78,15 +78,19 @@ sub read_file {
     if (defined $parse_mod) {
 	@try_order = ($parse_mod);
     } elsif ($file =~ m{\.json$}i) {
-	@try_order = ('JSON::XS', 'JSON', 'YAML::Syck', 'YAML');
+	@try_order = ('JSON::XS', 'JSON', 'YAML::Syck', 'YAML', 'YAML::XS');
     } else { # yaml or don't know
-	@try_order = ('YAML::Syck', 'YAML', 'JSON::XS', 'JSON');
+	@try_order = ('YAML::Syck', 'YAML', 'YAML::XS', 'JSON::XS', 'JSON');
     }
 
     my @errors;
     for my $try (@try_order) {
 	if      ($try eq 'YAML::Syck' && eval { require YAML::Syck; 1 }) {
 	    my @data = eval { YAML::Syck::LoadFile($file) };
+	    return @data if !$@;
+	    push @errors, $@;
+	} elsif ($try eq 'YAML::XS'   && eval { require YAML::XS; 1 }) {
+	    my @data = eval { YAML::XS::LoadFile($file) };
 	    return @data if !$@;
 	    push @errors, $@;
 	} elsif ($try eq 'YAML'       && eval { require YAML; 1 }) {
@@ -168,9 +172,9 @@ B<pkwalify> validates the data from I<datafile> (which may be a
 L<YAML> or L<JSON> file) against a schema defined with I<schemafile>
 (which also may be a YAML or JSON file).
 
-It is required that either L<YAML> or L<YAML::Syck> is installed to
-parse YAML files, or either L<JSON> or L<JSON::XS> for JSON files.
-Or the module specified on the command-line.
+It is required that either L<YAML>, L<YAML::XS> or L<YAML::Syck> is
+installed to parse YAML files, or either L<JSON> or L<JSON::XS> for
+JSON files. Or the module specified on the command-line.
 
 The program returns the number of errors found in the datafile. An
 exit status 0 means no errors.
@@ -186,7 +190,7 @@ Specify a schema file, either as YAML or JSON. Required.
 =item -m I<parse-mod>
 
 Specify the YAML or JSON Perl module to use. Valid modules are:
-L<YAML>, L<YAML::Syck>, L<JSON> and L<JSON::XS>.
+L<YAML>, L<YAML::XS>, L<YAML::Syck>, L<JSON> and L<JSON::XS>.
 
 =item -s
 
@@ -208,7 +212,8 @@ Slaven Reziæ, E<lt>srezic@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
-L<Kwalify>, L<kwalify(1)>, L<JSON>, L<JSON::XS>, L<YAML>, L<YAML::Syck>.
+L<Kwalify>, L<kwalify(1)>, L<JSON>, L<JSON::XS>, L<YAML>, L<YAML::XS>,
+L<YAML::Syck>.
 
 =cut
 
