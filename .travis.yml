@@ -1,28 +1,48 @@
 language: perl
 perl:
-  - "5.22"
-  - "5.20"
-  - "5.18"
-  - "5.16"
-  - "5.14"
-  - "5.12"
-  - "5.10"
-  - "5.8"
 matrix:
   include:
+    - perl: "5.30"
+      dist: xenial
+    - perl: "5.26"
+      dist: xenial
+    - perl: "5.22"
+      dist: xenial
+    - perl: "5.20"
+      dist: trusty
     - perl: "5.18"
+      dist: trusty
+    - perl: "5.16"
+      dist: precise
+    - perl: "5.14"
+      dist: precise
+    - perl: "5.12"
+      dist: precise
+    - perl: "5.10"
+      dist: precise
+    - perl: "5.8"
+      dist: precise
+
+    - perl: "5.22"
+      dist: xenial
       env: WITH_JSON_XS=1 WITH_YAML_SYCK=1
-    - perl: "5.18"
+    - perl: "5.22"
+      dist: xenial
       env: WITH_JSON_XS=1 WITH_YAML_XS=1
-    - perl: "5.18"
+    - perl: "5.22"
+      dist: xenial
       env: WITH_JSON=1 WITH_YAML=1
-    - perl: "5.18"
+    - perl: "5.22"
+      dist: xenial
       env: WITH_YAML_SYCK=1
-    - perl: "5.18"
+    - perl: "5.22"
+      dist: xenial
       env: WITH_YAML_XS=1
-    - perl: "5.18"
+    - perl: "5.22"
+      dist: xenial
       env: WITH_YAML=1
-    - perl: "5.18"
+    - perl: "5.22"
+      dist: xenial
       env: WITH_JSON=1 WITH_YAML=1 WITH_IPC_RUN=1 DO_COVERALLS=1
 
 before_install:
