@@ -40,6 +40,9 @@ matrix:
       env: WITH_YAML_XS=1
     - perl: "5.22"
       dist: xenial
+      env: WITH_YAML_PP=1
+    - perl: "5.22"
+      dist: xenial
       env: WITH_YAML=1
     - perl: "5.22"
       dist: xenial
@@ -51,6 +54,7 @@ before_install:
   - '[ "$WITH_JSON"      =  1 ] && cpanm --quiet --notest JSON                               || true'
   - '[ "$WITH_YAML_SYCK" =  1 ] && cpanm --quiet --notest YAML::Syck                         || true'
   - '[ "$WITH_YAML_XS"   =  1 ] && cpanm --quiet --notest YAML::XS                           || true'
+  - '[ "$WITH_YAML_PP"   =  1 ] && cpanm --quiet --notest YAML::PP                           || true'
   - '[ "$WITH_YAML"      =  1 ] && cpanm --quiet --notest YAML                               || true'
   - '[ "$WITH_IPC_RUN"   =  1 ] && cpanm --quiet --notest IPC::Run                           || true'
 after_script:
