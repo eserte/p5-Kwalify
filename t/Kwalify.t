@@ -37,9 +37,14 @@ $SIG{__WARN__} = sub { push @w, @_ };
 
 use_ok('Schema::Kwalify');
 
-my $can_yaml = (eval { require YAML::Syck; 1 } || eval { require YAML::XS; 1 });
-if ($can_yaml) {
-    *YAML_Load = defined &YAML::Syck::Load ? \&YAML::Syck::Load : \&YAML::XS::Load;
+my $use_yaml_module;
+for my $mod (qw(YAML::XS YAML::PP)) { # YAML::Syck currently does not work --- https://github.com/toddr/YAML-Syck/issues/52
+    if (eval qq{ require $mod; 1 }) {
+	no strict 'refs';
+	*YAML_Load = \&{$mod . '::Load'};
+	$use_yaml_module = $mod;
+	last;
+    }
 }
 
 sub is_valid_yaml {
@@ -63,8 +68,8 @@ sub is_invalid_yaml {
 }
 
 SKIP: {
-    skip("Need YAML::Syck, YAML or YAML::XS for tests", $yaml_mod_tests)
-	if !$can_yaml;
+    skip("Need a YAML loading module for tests", $yaml_mod_tests)
+	if !$use_yaml_module;
 
     my $schema01 = <<'EOF';
 type:   seq
