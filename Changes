@@ -8,6 +8,8 @@ Revision history for Perl extension Kwalify.
 	  This addresses https://github.com/eserte/p5-Kwalify/issues/1
 	- more tests
 	- enable travis-ci and coveralls
+	- don't use YAML::Syck anymore in the tests because of
+	  https://github.com/toddr/YAML-Syck/issues/52 (use YAML::PP instead)
 
 1.22
 	- cease possible "unitinialized value" warnings
