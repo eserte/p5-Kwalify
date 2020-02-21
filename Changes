@@ -1,5 +1,8 @@
 Revision history for Perl extension Kwalify.
 
+1.23    2020-02-21
+	- stable release with all changes in 1.22_90
+
 1.22_90	2020-01-31
 	- change handling of required:no for existing undefined data.
 	  Now the behavior is like in the ruby implementation:
