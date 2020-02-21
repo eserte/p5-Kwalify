@@ -191,7 +191,8 @@ sub validate_str {
 
 sub validate_int {
     my($self, $schema, $data, $path) = @_;
-    if ($data !~ m{^[+-]?\d+$}) { # XXX what about scientific notation?
+    # http://yaml.org/type/int.html
+    unless ($data =~  m/[-+]?0b[0-1_]+|[-+]?0[0-7_]+|[-+]?(0|[1-9][0-9_]*)|[-+]?0x[0-9a-fA-F_]+|[-+]?[1-9][0-9_]*(:[0-5]?[0-9])+/) {
 	$self->_error("Non-valid data '" . $data . "', expected an int");
     }
     $self->_additional_rules($schema, $data, $path);
@@ -199,7 +200,8 @@ sub validate_int {
 
 sub validate_float {
     my($self, $schema, $data, $path) = @_;
-    if ($data !~ m{^[+-]?\d+\.\d+$}) { # XXX other values?
+    # http://yaml.org/type/float.html
+    unless ($data =~ m/[-+]?([0-9][0-9_]*)?\.[0-9.]*([eE][-+][0-9]+)?|[-+]?[0-9][0-9_]*(:[0-5]?[0-9])+\.[0-9_]*|[-+]?\.(inf|Inf|INF)|\.(nan|NaN|NAN)/) {
 	$self->_error("Non-valid data '" . $data . "', expected a float");
     }
     $self->_additional_rules($schema, $data, $path);
