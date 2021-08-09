@@ -1,52 +1,89 @@
 language: perl
-perl:
+arch:
+  - arm64
 matrix:
   include:
-    - perl: "5.30"
-      dist: xenial
-    - perl: "5.26"
-      dist: xenial
-    - perl: "5.22"
-      dist: xenial
-    - perl: "5.20"
-      dist: trusty
-    - perl: "5.18"
-      dist: trusty
-    - perl: "5.16"
-      dist: precise
-    - perl: "5.14"
-      dist: precise
-    - perl: "5.12"
-      dist: precise
-    - perl: "5.10"
-      dist: precise
-    - perl: "5.8"
-      dist: precise
+    - dist: xenial
+      perl: 5.24
+    - dist: bionic
+      perl: 5.26
+    - dist: focal
+      perl: 5.32
 
-    - perl: "5.22"
-      dist: xenial
+    - dist: xenial
+      perl: 5.24
       env: WITH_JSON_XS=1 WITH_YAML_SYCK=1
-    - perl: "5.22"
-      dist: xenial
+    - dist: bionic
+      perl: 5.26
       env: WITH_JSON_XS=1 WITH_YAML_XS=1
-    - perl: "5.22"
-      dist: xenial
+    - dist: focal
+      perl: 5.32
       env: WITH_JSON=1 WITH_YAML=1
-    - perl: "5.22"
-      dist: xenial
+    - dist: xenial
+      perl: 5.24
       env: WITH_YAML_SYCK=1
-    - perl: "5.22"
-      dist: xenial
+    - dist: bionic
+      perl: 5.26
       env: WITH_YAML_XS=1
-    - perl: "5.22"
-      dist: xenial
+    - dist: focal
+      perl: 5.32
       env: WITH_YAML_PP=1
-    - perl: "5.22"
-      dist: xenial
+    - dist: xenial
+      perl: 5.24
       env: WITH_YAML=1
-    - perl: "5.22"
-      dist: xenial
+    - dist: bionic
+      perl: 5.26
       env: WITH_JSON=1 WITH_YAML=1 WITH_IPC_RUN=1 DO_COVERALLS=1
+
+#perl:
+#matrix:
+#  include:
+#    - perl: "5.30"
+#      dist: xenial
+#    - perl: "5.26"
+#      dist: xenial
+#    - perl: "5.22"
+#      dist: xenial
+#    - perl: "5.20"
+#      dist: trusty
+#    - perl: "5.18"
+#      dist: trusty
+#    - perl: "5.16"
+#      dist: precise
+#    - perl: "5.14"
+#      dist: precise
+#    - perl: "5.12"
+#      dist: precise
+#    - perl: "5.10"
+#      dist: precise
+#    - perl: "5.8"
+#      dist: precise
+#
+#    - perl: "5.22"
+#      dist: xenial
+#      env: WITH_JSON_XS=1 WITH_YAML_SYCK=1
+#    - perl: "5.22"
+#      dist: xenial
+#      env: WITH_JSON_XS=1 WITH_YAML_XS=1
+#    - perl: "5.22"
+#      dist: xenial
+#      env: WITH_JSON=1 WITH_YAML=1
+#    - perl: "5.22"
+#      dist: xenial
+#      env: WITH_YAML_SYCK=1
+#    - perl: "5.22"
+#      dist: xenial
+#      env: WITH_YAML_XS=1
+#    - perl: "5.22"
+#      dist: xenial
+#      env: WITH_YAML_PP=1
+#    - perl: "5.22"
+#      dist: xenial
+#      env: WITH_YAML=1
+#    - perl: "5.22"
+#      dist: xenial
+#      env: WITH_JSON=1 WITH_YAML=1 WITH_IPC_RUN=1 DO_COVERALLS=1
+#sudo: false
 
 before_install:
   - '[ "$DO_COVERALLS"   =  1 ] && cpanm --quiet --notest Devel::Cover::Report::Coveralls    || true'
@@ -63,4 +100,5 @@ after_script:
 branches:
   except:
     - /appveyor/
-sudo: false
+    - /github-actions/
+    - /doozer/
