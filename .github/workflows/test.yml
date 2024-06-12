@@ -41,7 +41,7 @@ jobs:
       if: "!startsWith(matrix.os,'windows-')"
 
   test_in_container:
-    name: Test with perl ${{ matrix.perlimage }}
+    name: Test with perl ${{ matrix.perlimage }} ${{ matrix.label }}
     runs-on: ubuntu-latest
     container: perl:${{ matrix.perlimage }}
     strategy:
@@ -54,6 +54,37 @@ jobs:
           - perlimage: 5.16.3-buster
           - perlimage: 5.18.4-buster
           - perlimage: 5.22.4-stretch
+          - perlimage: 5.24.4-threaded-buster
+            WITH_JSON_XS: 1
+            WITH_YAML_SYCK: 1
+            label: "with JSON::XS + YAML::Syck"
+          - perlimage: 5.26.3-buster
+            WITH_JSON_XS: 1
+            WITH_YAML_XS: 1
+            label: "with JSON::XS + YAML::XS"
+          - perlimage: 5.28.3-buster
+            WITH_JSON: 1
+            WITH_YAML: 1
+            label: "with JSON + YAML"
+          - perlimage: 5.30.3-bullseye
+            WITH_YAML_SYCK: 1
+            label: "with YAML::Syck"
+          - perlimage: 5.32.1-bullseye
+            WITH_YAML_XS: 1
+            label: "with YAML::XS"
+          - perlimage: 5.34.3-bullseye
+            WITH_YAML_PP: 1
+            label: "with YAML::PP"
+          - perlimage: 5.36.3-bookworm
+            WITH_YAML: 1
+            label: "with YAML"
+          - perlimage: 5.38.2-bookworm
+            WITH_JSON: 1
+            WITH_YAML: 1
+            WITH_IPC_RUN: 1
+            DO_COVERALLS: 1
+            label: "with JSON + YAML + IPC::Run + DO_COVERALLS"
+          - perlimage: 5.40.0-slim-bookworm
 
     steps:
     - uses: actions/checkout@v3
@@ -61,8 +92,25 @@ jobs:
       env:
         HARNESS_TIMER:   1
         HARNESS_OPTIONS: j8
+        DO_COVERALLS:    ${{ matrix.DO_COVERALLS }}
+        WITH_JSON_XS:    ${{ matrix.WITH_JSON_XS }}
+        WITH_JSON:       ${{ matrix.WITH_JSON }}
+        WITH_YAML_SYCK:  ${{ matrix.WITH_YAML_SYCK }}
+        WITH_YAML_XS:    ${{ matrix.WITH_YAML_XS }}
+        WITH_YAML_PP:    ${{ matrix.WITH_YAML_PP }}
+        WITH_YAML:       ${{ matrix.WITH_YAML }}
+        WITH_IPC_RUN:    ${{ matrix.WITH_IPC_RUN }}
       run: |
+        [ "$DO_COVERALLS"   =  1 ] && cpanm --quiet --notest Devel::Cover::Report::Coveralls    || true
+        [ "$WITH_JSON_XS"   =  1 ] && cpanm --quiet --notest JSON::XS                           || true
+        [ "$WITH_JSON"      =  1 ] && cpanm --quiet --notest JSON                               || true
+        [ "$WITH_YAML_SYCK" =  1 ] && cpanm --quiet --notest YAML::Syck                         || true
+        [ "$WITH_YAML_XS"   =  1 ] && cpanm --quiet --notest YAML::XS                           || true
+        [ "$WITH_YAML_PP"   =  1 ] && cpanm --quiet --notest YAML::PP                           || true
+        [ "$WITH_YAML"      =  1 ] && cpanm --quiet --notest YAML                               || true
+        [ "$WITH_IPC_RUN"   =  1 ] && cpanm --quiet --notest IPC::Run                           || true
         cpanm --quiet --installdeps --notest . || ( cat ~/.cpanm/work/*/build.log; false )
         perl Makefile.PL
         make -j8
         make test
+        [ "$DO_COVERALLS"   =  1 ] && cover -test -report coveralls || true
