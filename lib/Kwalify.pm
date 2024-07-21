@@ -3,12 +3,12 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006,2007,2008,2009,2010,2015,2020 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007,2008,2009,2010,2015,2020,2024 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
 # Mail: srezic@cpan.org
-# WWW:  http://www.rezic.de/eserte/
+# WWW:  https://github.com/eserte/p5-kwalify/
 #
 
 package Kwalify;
@@ -20,7 +20,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub validate ($$) {
     my($schema, $data) = @_;
