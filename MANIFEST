@@ -11,5 +11,7 @@ t/testdata/document05b.yaml
 t/testdata/kwalify.yaml
 t/testdata/schema05.yaml
 t/testdata/META-spec-1.3.yml
+t/yaml-int.t
+t/yaml-float.t
 lib/Kwalify.pm
 lib/Schema/Kwalify.pm
