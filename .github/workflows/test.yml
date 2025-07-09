@@ -85,6 +85,7 @@ jobs:
             DO_COVERALLS: 1
             label: "with JSON + YAML + IPC::Run + DO_COVERALLS"
           - perlimage: 5.40.0-slim-bookworm
+          - perlimage: 5.42.0-slim-bookworm
 
     steps:
     - name: apt hacks
